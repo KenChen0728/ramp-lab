@@ -73,7 +73,11 @@ h1{font-family:var(--display);font-size:clamp(28px,3.6vw,42px);line-height:1.15;
 .control-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
 .control-head label,.control legend{font-weight:700;font-size:16px;padding:0}
 output{font-family:var(--display);font-size:24px;font-weight:700;color:var(--coat);font-variant-numeric:tabular-nums}
-input[type=range]{width:100%;accent-color:var(--coat);margin:4px 0}
+input[type=range]{width:100%;accent-color:var(--coat);margin:6px 0;height:32px;-webkit-appearance:none;appearance:none;background:transparent}
+input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:99px;background:var(--line)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;margin-top:-11px;border-radius:50%;background:var(--coat);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+input[type=range]::-moz-range-track{height:8px;border-radius:99px;background:var(--line)}
+input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:var(--coat);border:3px solid #fff}
 .scale-labels{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-soft)}
 .presets{display:flex;gap:8px}
 .chipbtn{flex:1;border:1px solid var(--line);background:var(--snow);color:var(--ink);border-radius:10px;padding:6px 8px;font-size:15px}
@@ -163,6 +167,14 @@ body.fs-on .land-hint{display:none!important}
 .is-fs .stage-foot{display:none}
 .is-fs video{width:100%!important;height:100%!important;max-height:none;object-fit:contain;border:0!important;border-radius:0!important;aspect-ratio:auto!important}
 @media (max-width:820px){.vbox{width:100%;flex:none}}
+.fsctl{display:none}
+.is-fs .fsctl{display:flex;flex-direction:column;gap:8px;position:absolute;top:12px;right:68px;z-index:7;background:rgba(20,28,46,.72);padding:10px 12px;border-radius:14px;color:#fff}
+.fsrow{display:flex;align-items:center;gap:6px}
+.fslab{font-size:14px;font-weight:700;width:36px;opacity:.85}
+.fsctl button{min-width:48px;height:42px;padding:0 10px;border-radius:10px;border:0;background:rgba(255,255,255,.16);color:#fff;font:inherit;font-size:16px;font-weight:700;cursor:pointer}
+.fsctl button[aria-pressed="true"]{background:#fff;color:#1e2a44}
+.fsctl .fsstep{font-size:22px;width:48px}
+.fsval{min-width:48px;text-align:center;font-size:22px;font-weight:800;color:#fff!important;font-family:inherit!important;font-variant-numeric:tabular-nums}
 .land-hint{display:none;position:fixed;right:10px;top:8px;z-index:30;font-size:12px;background:rgba(0,0,0,.55);color:#fff;padding:4px 10px;border-radius:999px;pointer-events:none}
 @media (max-width:900px){
   .stage{position:sticky;top:0;z-index:5;box-shadow:0 6px 16px rgba(0,0,0,.18)}
@@ -252,6 +264,11 @@ body.fs-on .land-hint{display:none!important}
       <div class="sim">
         <div class="stage">
           <canvas id="scene" role="img" aria-label="士兵騎馬下坡的示意動畫"></canvas>
+          <div class="fsctl" aria-label="快速調整">
+            <div class="fsrow"><span class="fslab">坡度</span><button type="button" data-a="13">13°</button><button type="button" data-a="17">17°</button><button type="button" data-a="21">21°</button></div>
+            <div class="fsrow"><span class="fslab">士兵</span><button type="button" class="fsstep" data-d="-0.5" aria-label="往馬尾">−</button><output class="fsval" id="fsScale">6</output><button type="button" class="fsstep" data-d="0.5" aria-label="往馬頭">＋</button></div>
+            <div class="fsrow"><span class="fslab">地面</span><button type="button" data-s="grip">砂紙</button><button type="button" data-s="paper">木板</button></div>
+          </div>
           <button class="fsbtn" type="button" aria-label="全螢幕"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path class="i-open" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><path class="i-close" d="M6 6l12 12M18 6L6 18"/></svg></button>
           <div class="stage-foot">
             <span class="key"><i class="k-cg"></i>重心</span>
@@ -771,6 +788,20 @@ body.fs-on .land-hint{display:none!important}
   });
   window.addEventListener('resize', fsLayout);
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && fsEl) fsToggle(fsEl); });
+
+  /* ---------- quick controls inside full screen ---------- */
+  function fsSync(){
+    document.querySelectorAll('.fsctl [data-a]').forEach(function(b){ b.setAttribute('aria-pressed', String(+b.dataset.a === st.theta)); });
+    document.querySelectorAll('.fsctl [data-s]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.s === st.surface)); });
+    $('fsScale').textContent = st.s;
+  }
+  function setIn(id, v){ var e = $(id); e.value = v; e.dispatchEvent(new Event('input')); }
+  document.querySelectorAll('.fsctl [data-a]').forEach(function(b){ b.addEventListener('click', function(){ setIn('slope', b.dataset.a); fsSync(); }); });
+  document.querySelectorAll('.fsctl [data-d]').forEach(function(b){ b.addEventListener('click', function(){ setIn('rider', Math.min(7, Math.max(1, st.s + (+b.dataset.d)))); fsSync(); }); });
+  document.querySelectorAll('.fsctl [data-s]').forEach(function(b){ b.addEventListener('click', function(){ $('surf-' + b.dataset.s).click(); fsSync(); }); });
+  ['slope','rider'].forEach(function(id){ $(id).addEventListener('input', fsSync); });
+  document.querySelectorAll('input[name=surface]').forEach(function(r){ r.addEventListener('change', fsSync); });
+  fsSync();
   /* ---------- boot ---------- */
   show((location.hash || '').slice(1) || 'sim', false);
   requestAnimationFrame(frame);
