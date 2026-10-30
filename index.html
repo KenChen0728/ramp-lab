@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>胡桃鉗下坡實驗室</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -127,7 +127,7 @@ input[type=range]{width:100%;accent-color:var(--coat);margin:4px 0}
 .secret-text{display:flex;flex-direction:column;gap:12px;min-width:0;flex:1}
 .secret-text h2{font-size:36px}
 .secret-text p{font-size:19px;line-height:1.7}
-@media (max-width:820px){.secret{flex-direction:column!important}.secret video{width:100%!important;flex:none}
+@media (max-width:820px){.secret{flex-direction:column!important}
   .subtabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
   .subtab{padding:10px 6px;font-size:15px;text-align:center;line-height:1.3}
   .subtab .long{display:none}}
@@ -139,11 +139,30 @@ input[type=range]{width:100%;accent-color:var(--coat);margin:4px 0}
   body:has(#view-sim:not([hidden])) .top, body:has(#view-secrets:not([hidden])) .top{display:none!important}
   .sim{display:block}
   .stage{position:fixed!important;inset:0;border:0;border-radius:0;box-shadow:none;z-index:20}
-  #scene{width:100vw;height:100vh;aspect-ratio:auto}
+  #scene{width:100vw;height:100vh;height:100dvh;aspect-ratio:auto}
   .secret{padding:0!important;border:0!important;background:#FBF8F2!important;position:fixed;inset:0;z-index:20;justify-content:center;align-items:center}
-  .secret video{width:100vw!important;height:100vh!important;max-height:100vh;flex:none;border:0;border-radius:0;aspect-ratio:auto}
+  .vbox{width:100vw;height:100vh;height:100dvh;flex:none}
+  .secret video{width:100%!important;height:100%!important;max-height:none;object-fit:contain;flex:none;border:0;border-radius:0;aspect-ratio:auto}
+  .fsbtn{display:none!important}
   body:has(#view-sim:not([hidden])) .land-hint, body:has(#view-secrets:not([hidden])) .land-hint{display:block!important}
 }
+
+.stage,.vbox{position:relative}
+.vbox{flex:0 0 64%;width:64%;min-width:0}
+.vbox video{width:100%!important;flex:none!important}
+.fsbtn{position:absolute;right:10px;bottom:10px;z-index:6;width:44px;height:44px;border-radius:12px;border:0;background:rgba(20,28,46,.62);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.stage .fsbtn{bottom:auto;top:10px}
+.fsbtn .i-close{display:none}
+.is-fs .fsbtn .i-open{display:none}.is-fs .fsbtn .i-close{display:inline}
+.is-fs .fsbtn{top:12px;right:12px;bottom:auto}
+body.fs-on{overflow:hidden}
+body.fs-on .land-hint{display:none!important}
+.is-fs{position:fixed!important;z-index:60;inset:0;width:100vw;height:100vh;height:100dvh;margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:#FBF8F2;display:flex;align-items:center;justify-content:center}
+.is-fs.rot{inset:auto;top:0;left:0;width:100vh;width:100dvh;height:100vw;transform-origin:top left;transform:translateX(100vw) rotate(90deg)}
+.is-fs #scene{width:100%;height:100%;aspect-ratio:auto}
+.is-fs .stage-foot{display:none}
+.is-fs video{width:100%!important;height:100%!important;max-height:none;object-fit:contain;border:0!important;border-radius:0!important;aspect-ratio:auto!important}
+@media (max-width:820px){.vbox{width:100%;flex:none}}
 .land-hint{display:none;position:fixed;right:10px;top:8px;z-index:30;font-size:12px;background:rgba(0,0,0,.55);color:#fff;padding:4px 10px;border-radius:999px;pointer-events:none}
 @media (max-width:900px){
   .stage{position:sticky;top:0;z-index:5;box-shadow:0 6px 16px rgba(0,0,0,.18)}
@@ -233,6 +252,7 @@ input[type=range]{width:100%;accent-color:var(--coat);margin:4px 0}
       <div class="sim">
         <div class="stage">
           <canvas id="scene" role="img" aria-label="士兵騎馬下坡的示意動畫"></canvas>
+          <button class="fsbtn" type="button" aria-label="全螢幕"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path class="i-open" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><path class="i-close" d="M6 6l12 12M18 6L6 18"/></svg></button>
           <div class="stage-foot">
             <span class="key"><i class="k-cg"></i>重心</span>
             <span class="key"><i class="k-g"></i>重力往下拉的方向</span>
@@ -298,7 +318,7 @@ input[type=range]{width:100%;accent-color:var(--coat);margin:4px 0}
       </div>
       <div class="secrets">
         <article class="secret" data-sec="0">
-          <video src="media/secret1.mp4" autoplay muted loop playsinline preload="auto" aria-label="筷子模型示範跨、站、跟三個動作"></video>
+          <div class="vbox"><video src="media/secret1.mp4" autoplay muted loop playsinline preload="auto" aria-label="筷子模型示範跨、站、跟三個動作"></video><button class="fsbtn" type="button" aria-label="全螢幕"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path class="i-open" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><path class="i-close" d="M6 6l12 12M18 6L6 18"/></svg></button></div>
           <div class="secret-text">
           <p class="num">秘密 1</p>
           <h2>跨、站、跟</h2>
@@ -307,7 +327,7 @@ input[type=range]{width:100%;accent-color:var(--coat);margin:4px 0}
           </div>
         </article>
         <article class="secret" data-sec="1" hidden>
-          <video src="media/secret2.mp4" autoplay muted loop playsinline preload="auto" aria-label="企鵝在冰面滑到底、在草地卡住"></video>
+          <div class="vbox"><video src="media/secret2.mp4" autoplay muted loop playsinline preload="auto" aria-label="企鵝在冰面滑到底、在草地卡住"></video><button class="fsbtn" type="button" aria-label="全螢幕"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path class="i-open" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><path class="i-close" d="M6 6l12 12M18 6L6 18"/></svg></button></div>
           <div class="secret-text">
           <p class="num">秘密 2</p>
           <h2>地面要抓得住</h2>
@@ -316,7 +336,7 @@ input[type=range]{width:100%;accent-color:var(--coat);margin:4px 0}
           </div>
         </article>
         <article class="secret" data-sec="2" hidden>
-          <video src="media/secret3.mp4" autoplay muted loop playsinline preload="auto" aria-label="士兵坐太前面會翻倒、太後面會卡住、坐剛好才能走下去"></video>
+          <div class="vbox"><video src="media/secret3.mp4" autoplay muted loop playsinline preload="auto" aria-label="士兵坐太前面會翻倒、太後面會卡住、坐剛好才能走下去"></video><button class="fsbtn" type="button" aria-label="全螢幕"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path class="i-open" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><path class="i-close" d="M6 6l12 12M18 6L6 18"/></svg></button></div>
           <div class="secret-text">
           <p class="num">秘密 3</p>
           <h2>士兵要坐對位置</h2>
@@ -375,6 +395,7 @@ input[type=range]{width:100%;accent-color:var(--coat);margin:4px 0}
   var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
   function show(v, write){
     if (VIEWS.indexOf(v) < 0) v = 'sim';
+    if (typeof fsEl !== 'undefined' && fsEl) fsToggle(fsEl);
     document.querySelectorAll('[data-view]').forEach(function(s){ s.hidden = s.dataset.view !== v; });
     tabs.forEach(function(b){ var on = b.dataset.target === v; b.setAttribute('aria-selected', on ? 'true' : 'false'); b.tabIndex = on ? 0 : -1; });
     if (write) { try { history.replaceState(null, '', '#' + v); } catch (e) {} }
@@ -393,10 +414,10 @@ input[type=range]{width:100%;accent-color:var(--coat);margin:4px 0}
   var cv = $('scene'), ctx = cv.getContext('2d');
   var W = 0, H = 0, dpr = 1;
   function sizeCanvas(){
-    var r = cv.getBoundingClientRect();
-    if (!r.width) return;
+    var w = cv.clientWidth, h = cv.clientHeight;
+    if (!w) return;
     dpr = Math.min(window.devicePixelRatio || 1, 2);
-    W = r.width; H = r.height;
+    W = w; H = h;
     cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
   }
   if (window.ResizeObserver) new ResizeObserver(sizeCanvas).observe(cv);
@@ -736,6 +757,20 @@ input[type=range]{width:100%;accent-color:var(--coat);margin:4px 0}
     this.textContent = open ? '收起答案' : '揭曉：小馬的電池是什麼？';
   });
 
+
+  /* ---------- full-screen button (works with rotation lock: rotates the view itself) ---------- */
+  var fsEl = null;
+  function fsLayout(){ if (fsEl) fsEl.classList.toggle('rot', window.innerHeight > window.innerWidth); sizeCanvas(); }
+  function fsToggle(box){
+    if (fsEl) { fsEl.classList.remove('is-fs','rot'); document.body.classList.remove('fs-on'); fsEl = null; }
+    else { fsEl = box; box.classList.add('is-fs'); document.body.classList.add('fs-on'); }
+    fsLayout(); if (typeof restart === 'function' && box.classList.contains('stage')) restart();
+  }
+  document.querySelectorAll('.fsbtn').forEach(function(b){
+    b.addEventListener('click', function(e){ e.stopPropagation(); fsToggle(b.parentNode); b.setAttribute('aria-label', fsEl ? '離開全螢幕' : '全螢幕'); });
+  });
+  window.addEventListener('resize', fsLayout);
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && fsEl) fsToggle(fsEl); });
   /* ---------- boot ---------- */
   show((location.hash || '').slice(1) || 'sim', false);
   requestAnimationFrame(frame);
