@@ -127,7 +127,30 @@ input[type=range]{width:100%;accent-color:var(--coat);margin:4px 0}
 .secret-text{display:flex;flex-direction:column;gap:12px;min-width:0;flex:1}
 .secret-text h2{font-size:36px}
 .secret-text p{font-size:19px;line-height:1.7}
-@media (max-width:820px){.secret{flex-direction:column!important}.secret video{width:100%!important;flex:none}}
+@media (max-width:820px){.secret{flex-direction:column!important}.secret video{width:100%!important;flex:none}
+  .subtabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .subtab{padding:10px 6px;font-size:15px;text-align:center;line-height:1.3}
+  .subtab .long{display:none}}
+/* phone turned sideways: full-screen viewing only (sim canvas / secret video), rotate back to adjust */
+@media (orientation:landscape) and (max-height:500px){
+  body{padding:0!important}
+  .wrap{max-width:none;gap:0}
+  .panel,.sec-title,.subtabs,.secret-text,.reveal,.stage-foot{display:none!important}
+  body:has(#view-sim:not([hidden])) .top, body:has(#view-secrets:not([hidden])) .top{display:none!important}
+  .sim{display:block}
+  .stage{position:fixed!important;inset:0;border:0;border-radius:0;box-shadow:none;z-index:20}
+  #scene{width:100vw;height:100vh;aspect-ratio:auto}
+  .secret{padding:0!important;border:0!important;background:#FBF8F2!important;position:fixed;inset:0;z-index:20;justify-content:center;align-items:center}
+  .secret video{width:100vw!important;height:100vh!important;max-height:100vh;flex:none;border:0;border-radius:0;aspect-ratio:auto}
+  body:has(#view-sim:not([hidden])) .land-hint, body:has(#view-secrets:not([hidden])) .land-hint{display:block!important}
+}
+.land-hint{display:none;position:fixed;right:10px;top:8px;z-index:30;font-size:12px;background:rgba(0,0,0,.55);color:#fff;padding:4px 10px;border-radius:999px;pointer-events:none}
+@media (max-width:900px){
+  .stage{position:sticky;top:0;z-index:5;box-shadow:0 6px 16px rgba(0,0,0,.18)}
+  .stage-foot{display:none}
+  .panel .card{gap:14px;padding:16px}
+  .top{gap:8px}
+}
 .home{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:20px;align-items:start}
 @media (max-width:820px){.home{grid-template-columns:1fr}}
 .home-h{font-family:var(--display);font-size:30px;margin:0 0 10px}
@@ -191,6 +214,7 @@ input[type=range]{width:100%;accent-color:var(--coat);margin:4px 0}
 }
 </style>
 
+<div class="land-hint">轉回直向就能調整</div>
 <div class="wrap">
   <header class="top">
     <div>
@@ -268,9 +292,9 @@ input[type=range]{width:100%;accent-color:var(--coat);margin:4px 0}
     <section id="view-secrets" data-view="secrets" role="tabpanel" aria-labelledby="tab-secrets" hidden>
       <h2 class="sec-title">木馬走下坡的三個秘密</h2>
       <div class="subtabs" role="tablist" aria-label="切換秘密">
-        <button type="button" role="tab" class="subtab" data-sec="0" aria-selected="true">秘密 1　跨、站、跟</button>
-        <button type="button" role="tab" class="subtab" data-sec="1" aria-selected="false">秘密 2　地面要抓得住</button>
-        <button type="button" role="tab" class="subtab" data-sec="2" aria-selected="false">秘密 3　士兵要坐對位置</button>
+        <button type="button" role="tab" class="subtab" data-sec="0" aria-selected="true">秘密 1<span class="long">　跨、站、跟</span></button>
+        <button type="button" role="tab" class="subtab" data-sec="1" aria-selected="false">秘密 2<span class="long">　地面要抓得住</span></button>
+        <button type="button" role="tab" class="subtab" data-sec="2" aria-selected="false">秘密 3<span class="long">　士兵要坐對位置</span></button>
       </div>
       <div class="secrets">
         <article class="secret" data-sec="0">
