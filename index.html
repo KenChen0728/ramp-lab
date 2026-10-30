@@ -116,7 +116,26 @@ input[type=range]{width:100%;accent-color:var(--coat);margin:4px 0}
 .conv-note{font-size:14px;color:var(--ink-soft)}
 
 /* secrets */
-.secrets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.sec-title{font-family:var(--display);font-size:clamp(26px,3.4vw,36px);margin:0 0 14px}
+.subtabs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.subtab{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:10px 18px;font:inherit;font-size:16px;font-weight:700;cursor:pointer}
+.subtab[aria-selected="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.secrets{display:block}
+.secret[hidden]{display:none!important}
+.secret{flex-direction:row!important;align-items:flex-start;gap:28px!important}
+.secret video{flex:0 0 64%;width:64%!important}
+.secret-text{display:flex;flex-direction:column;gap:12px;min-width:0;flex:1}
+.secret-text h2{font-size:36px}
+.secret-text p{font-size:19px;line-height:1.7}
+@media (max-width:820px){.secret{flex-direction:column!important}.secret video{width:100%!important;flex:none}}
+.home{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:820px){.home{grid-template-columns:1fr}}
+.home-h{font-family:var(--display);font-size:30px;margin:0 0 10px}
+.home-steps{margin:0;padding-left:1.4em;font-size:17px;line-height:1.9}
+.home-tip{margin:14px 0 0;font-weight:700;color:var(--coat);font-size:17px}
+.hgt{width:100%;border-collapse:collapse;text-align:center;font-variant-numeric:tabular-nums}
+.hgt th{font-size:14px;color:var(--ink-soft);font-weight:600;padding:4px}
+.hgt td{font-size:18px;font-weight:700;padding:6px 4px;border-top:1px solid var(--line)}
 .secret{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:20px 20px 24px;display:flex;flex-direction:column;gap:10px;min-width:0}
 .secret video{width:100%;height:auto;aspect-ratio:16/10;object-fit:contain;display:block;background:#FBF8F2;border-radius:12px;border:1px solid var(--line)}
 .secret .num{font-size:13px;font-weight:700;letter-spacing:.14em;color:var(--coat)}
@@ -181,7 +200,7 @@ input[type=range]{width:100%;accent-color:var(--coat);margin:4px 0}
     <nav class="tabs" role="tablist" aria-label="切換頁面">
       <button class="tab" role="tab" id="tab-sim" data-target="sim" aria-controls="view-sim" aria-selected="true" type="button">下坡模擬器</button>
       <button class="tab" role="tab" id="tab-secrets" data-target="secrets" aria-controls="view-secrets" aria-selected="false" type="button">三個秘密</button>
-      <button class="tab" role="tab" id="tab-timer" data-target="timer" aria-controls="view-timer" aria-selected="false" type="button">計時器</button>
+      <button class="tab" role="tab" id="tab-home" data-target="home" aria-controls="view-home" aria-selected="false" type="button">在家玩</button>
     </nav>
   </header>
 
@@ -242,44 +261,44 @@ input[type=range]{width:100%;accent-color:var(--coat);margin:4px 0}
             <p class="try" id="resTry"></p>
           </div>
 
-          <div class="card conv">
-            <p class="conv-title">書本高度換算角度</p>
-            <div class="conv-grid">
-              <label for="rampLen">坡道板長度<span class="unit">公分</span></label>
-              <input type="number" id="rampLen" min="1" step="0.5" value="60" inputmode="decimal">
-              <label for="rampHeight">書疊總高度<span class="unit">公分</span></label>
-              <input type="number" id="rampHeight" min="0" step="0.5" value="10" inputmode="decimal">
-            </div>
-            <p class="conv-out">大約 <output id="convOut" for="rampLen rampHeight">9.6°</output></p>
-            <p class="conv-note" id="convNote">量坡道板的長度，和墊高那一端的書疊高度。</p>
-            <button class="btn ghost" id="convApply" type="button">套用到模擬器</button>
-          </div>
         </div>
       </div>
     </section>
 
     <section id="view-secrets" data-view="secrets" role="tabpanel" aria-labelledby="tab-secrets" hidden>
+      <h2 class="sec-title">木馬走下坡的三個秘密</h2>
+      <div class="subtabs" role="tablist" aria-label="切換秘密">
+        <button type="button" role="tab" class="subtab" data-sec="0" aria-selected="true">秘密 1　跨、站、跟</button>
+        <button type="button" role="tab" class="subtab" data-sec="1" aria-selected="false">秘密 2　地面要抓得住</button>
+        <button type="button" role="tab" class="subtab" data-sec="2" aria-selected="false">秘密 3　士兵要坐對位置</button>
+      </div>
       <div class="secrets">
-        <article class="secret">
-          <video src="media/secret1.mp4" autoplay muted loop playsinline aria-label="筷子模型示範跨、站、跟三個動作"></video>
+        <article class="secret" data-sec="0">
+          <video src="media/secret1.mp4" autoplay muted loop playsinline preload="auto" aria-label="筷子模型示範跨、站、跟三個動作"></video>
+          <div class="secret-text">
           <p class="num">秘密 1</p>
           <h2>跨、站、跟</h2>
           <p>前腳先跨出去，身體站到前腳上，後腳再跟上來。兩隻腳輪流撐住身體，就一步一步往前走。</p>
           <p class="where"><b>在木馬身上：</b>前腳踏出去，後腳像鐘擺一樣盪過來跟上。</p>
+          </div>
         </article>
-        <article class="secret">
-          <video src="media/secret2.mp4" autoplay muted loop playsinline aria-label="企鵝在冰面滑到底、在草地卡住"></video>
+        <article class="secret" data-sec="1" hidden>
+          <video src="media/secret2.mp4" autoplay muted loop playsinline preload="auto" aria-label="企鵝在冰面滑到底、在草地卡住"></video>
+          <div class="secret-text">
           <p class="num">秘密 2</p>
           <h2>地面要抓得住</h2>
           <p>冰面很滑，企鵝一路滑下去；草地很粗糙，把企鵝抓住。抓住你的力量，叫做摩擦力。</p>
           <p class="where"><b>在木馬身上：</b>坡道貼了砂紙，讓地面抓住木馬的腳。</p>
+          </div>
         </article>
-        <article class="secret">
-          <video src="media/secret3.mp4" autoplay muted loop playsinline aria-label="士兵坐太前面會翻倒、太後面會卡住、坐剛好才能走下去"></video>
+        <article class="secret" data-sec="2" hidden>
+          <video src="media/secret3.mp4" autoplay muted loop playsinline preload="auto" aria-label="士兵坐太前面會翻倒、太後面會卡住、坐剛好才能走下去"></video>
+          <div class="secret-text">
           <p class="num">秘密 3</p>
           <h2>士兵要坐對位置</h2>
           <p>士兵坐太前面，木馬會往前翻；太後面，走一步就卡住；坐剛好，才能一步一步走下去。</p>
           <p class="where"><b>在木馬身上：</b>移動士兵，就是在調整重心。</p>
+          </div>
         </article>
       </div>
       <div class="reveal">
@@ -291,22 +310,31 @@ input[type=range]{width:100%;accent-color:var(--coat);margin:4px 0}
       </div>
     </section>
 
-    <section id="view-timer" data-view="timer" role="tabpanel" aria-labelledby="tab-timer" hidden>
-      <div class="timer" id="timerBox">
-        <p class="timer-name" id="tName">休息時間</p>
-        <p class="digits" id="tDigits" role="timer" aria-live="off">15:00</p>
-        <p class="timer-sub" id="tSub">按「開始」倒數</p>
-        <div class="row">
-          <button class="btn" id="tStart" type="button">開始</button>
-          <button class="btn ghost" id="tAdd" type="button">加 1 分鐘</button>
-          <button class="btn ghost" id="tReset" type="button">重設</button>
-          <button class="btn ghost" id="tFull" type="button" hidden>全螢幕</button>
+    <section id="view-home" data-view="home" role="tabpanel" aria-labelledby="tab-home" hidden>
+      <div class="home">
+        <div class="card home-intro">
+          <h2 class="home-h">用書本做一條坡道</h2>
+          <ol class="home-steps">
+            <li>找一塊硬的板子當坡道（墊板、木板、厚紙板都可以）。</li>
+            <li>一端用書本墊高，另一端放在桌上。</li>
+            <li>板子上鋪一條毛巾或砂紙，讓地面抓得住木馬的腳。</li>
+            <li>量板子長度和書疊高度，填到右邊，就知道坡度是幾度。</li>
+          </ol>
+          <p class="home-tip">挑戰看看：坡越陡，士兵要往馬頭還是馬尾移？</p>
         </div>
-        <div class="row" id="tPresets">
-          <button class="chipbtn" type="button" data-min="30" data-name="著色時間" aria-pressed="false">著色 30 分</button>
-          <button class="chipbtn" type="button" data-min="15" data-name="休息時間" aria-pressed="true">休息 15 分</button>
-          <button class="chipbtn" type="button" data-min="10" data-name="休息時間" aria-pressed="false">休息 10 分</button>
-          <button class="chipbtn" type="button" data-min="5" data-name="倒數 5 分鐘" aria-pressed="false">5 分鐘</button>
+        <div class="card conv">
+          <p class="conv-title">書本高度換算角度</p>
+          <div class="conv-grid">
+            <label for="rampLen">坡道板長度<span class="unit">公分</span></label>
+            <input type="number" id="rampLen" min="1" step="0.5" value="40" inputmode="decimal">
+            <label for="rampHeight">書疊總高度<span class="unit">公分</span></label>
+            <input type="number" id="rampHeight" min="0" step="0.5" value="9" inputmode="decimal">
+          </div>
+          <p class="conv-out">大約 <output id="convOut" for="rampLen rampHeight">13°</output></p>
+          <p class="conv-note" id="convNote">量坡道板的長度，和墊高那一端的書疊高度。</p>
+          <p class="conv-title" style="margin-top:6px">想要跟課堂一樣的角度，書要疊多高？</p>
+          <table class="hgt"><tr><th>13°</th><th>17°</th><th>21°</th></tr><tr><td id="h13">—</td><td id="h17">—</td><td id="h21">—</td></tr></table>
+          <button class="btn ghost" id="convApply" type="button">用這個角度去模擬器試試</button>
         </div>
       </div>
     </section>
@@ -319,7 +347,7 @@ input[type=range]{width:100%;accent-color:var(--coat);margin:4px 0}
   var reduce = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : {matches:false};
 
   /* ---------- tabs ---------- */
-  var VIEWS = ['sim','secrets','timer'];
+  var VIEWS = ['sim','secrets','home'];
   var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
   function show(v, write){
     if (VIEWS.indexOf(v) < 0) v = 'sim';
@@ -654,92 +682,37 @@ input[type=range]{width:100%;accent-color:var(--coat);margin:4px 0}
     if (h >= L) { convDeg = null; $('convOut').textContent = '—'; $('convNote').textContent = '書疊高度要比坡道板短。'; return; }
     convDeg = Math.asin(h / L) / D2R;
     $('convOut').textContent = convDeg.toFixed(1) + '°';
+    ['13','17','21'].forEach(function(a){ $('h'+a).textContent = (L * Math.sin(+a * D2R)).toFixed(1) + ' 公分'; });
     $('convNote').textContent = convDeg > 30 ? '超過 30°，模擬器最多只到 30°。' : '量坡道板的長度，和墊高那一端的書疊高度。';
   }
   $('rampLen').addEventListener('input', convert);
   $('rampHeight').addEventListener('input', convert);
   $('convApply').addEventListener('click', function(){
     if (convDeg === null) return;
-    var s = $('slope'); s.value = Math.min(30, Math.round(convDeg)); s.dispatchEvent(new Event('input'));
+    var s = $('slope'); s.value = Math.min(30, Math.round(convDeg)); s.dispatchEvent(new Event('input')); show('sim', true); window.scrollTo(0,0);
   });
   convert();
 
   /* ---------- secrets ---------- */
+  var subs = Array.prototype.slice.call(document.querySelectorAll('.subtab'));
+  subs.forEach(function(b){ b.addEventListener('click', function(){
+    var k = b.dataset.sec;
+    subs.forEach(function(o){ o.setAttribute('aria-selected', o === b ? 'true' : 'false'); });
+    document.querySelectorAll('.secret').forEach(function(a){
+      var on = a.dataset.sec === k; a.hidden = !on;
+      var v = a.querySelector('video');
+      if (!v) return;
+      if (on) { v.muted = true; v.loop = true; v.load(); var p = v.play(); if (p && p.catch) p.catch(function(){}); }
+      else v.pause();
+    });
+  }); });
   $('revealBtn').addEventListener('click', function(){
     var a = $('answer'), open = a.hidden;
     a.hidden = !open; this.setAttribute('aria-expanded', open ? 'true' : 'false');
     this.textContent = open ? '收起答案' : '揭曉：小馬的電池是什麼？';
   });
 
-  /* ---------- timer ---------- */
-  var tm = { total:900, left:900, running:false, endAt:0, iv:0 }, audio = null, lock = null;
-  function fmt(s){ var m = Math.floor(s / 60), r = s % 60; return (m < 10 ? '0' : '') + m + ':' + (r < 10 ? '0' : '') + r; }
-  function clock(ms){ var d = new Date(ms), h = d.getHours(), m = d.getMinutes(); return h + ':' + (m < 10 ? '0' : '') + m; }
-  function render(){
-    $('tDigits').textContent = fmt(tm.left);
-    $('tStart').textContent = tm.running ? '暫停' : (tm.left < tm.total && tm.left > 0 ? '繼續' : '開始');
-    if (tm.running) $('tSub').textContent = '預計 ' + clock(tm.endAt) + ' 結束';
-    else if (tm.left === 0) $('tSub').textContent = '時間到！請回到座位';
-    else if (tm.left < tm.total) $('tSub').textContent = '已暫停';
-    else $('tSub').textContent = '按「開始」倒數';
-    $('timerBox').classList.toggle('done', tm.left === 0);
-  }
-  function tick(){
-    tm.left = Math.max(0, Math.ceil((tm.endAt - Date.now()) / 1000));
-    if (tm.left === 0) finish();
-    render();
-  }
-  function chime(){
-    if (!audio) return;
-    try {
-      [0, 0.35, 0.7].forEach(function(off, i){
-        var o = audio.createOscillator(), gn = audio.createGain(), t0 = audio.currentTime + off;
-        o.frequency.value = [784, 659, 988][i]; o.type = 'sine';
-        gn.gain.setValueAtTime(0.0001, t0); gn.gain.exponentialRampToValueAtTime(0.3, t0 + 0.02); gn.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.6);
-        o.connect(gn); gn.connect(audio.destination); o.start(t0); o.stop(t0 + 0.65);
-      });
-    } catch (e) {}
-  }
-  function releaseLock(){ if (lock) { try { lock.release(); } catch (e) {} lock = null; } }
-  function finish(){ tm.running = false; clearInterval(tm.iv); releaseLock(); chime(); }
-  function start(){
-    try { if (!audio) audio = new (window.AudioContext || window.webkitAudioContext)(); if (audio.state === 'suspended') audio.resume(); } catch (e) { audio = null; }
-    if (tm.left === 0) tm.left = tm.total;
-    tm.endAt = Date.now() + tm.left * 1000; tm.running = true;
-    clearInterval(tm.iv); tm.iv = setInterval(tick, 250);
-    if (navigator.wakeLock) navigator.wakeLock.request('screen').then(function(l){ lock = l; }).catch(function(){});
-    render();
-  }
-  function pause(){ tm.left = Math.max(0, Math.ceil((tm.endAt - Date.now()) / 1000)); tm.running = false; clearInterval(tm.iv); releaseLock(); render(); }
-  $('tStart').addEventListener('click', function(){ tm.running ? pause() : start(); });
-  $('tReset').addEventListener('click', function(){ if (tm.running) pause(); tm.left = tm.total; render(); });
-  $('tAdd').addEventListener('click', function(){
-    if (tm.left === 0 && !tm.running) { tm.left = 60; render(); return; }
-    tm.left += 60; if (tm.running) tm.endAt += 60000; render();
-  });
-  document.querySelectorAll('#tPresets [data-min]').forEach(function(b){
-    b.addEventListener('click', function(){
-      if (tm.running) pause();
-      tm.total = tm.left = (+b.dataset.min) * 60;
-      $('tName').textContent = b.dataset.name;
-      document.querySelectorAll('#tPresets [data-min]').forEach(function(o){ o.setAttribute('aria-pressed', o === b ? 'true' : 'false'); });
-      render();
-    });
-  });
-  if (document.fullscreenEnabled) {
-    var fb = $('tFull'); fb.hidden = false;
-    fb.addEventListener('click', function(){
-      if (document.fullscreenElement) { document.exitFullscreen().catch(function(){}); }
-      else { var el = $('view-timer'); if (el.requestFullscreen) el.requestFullscreen().catch(function(){}); }
-    });
-    document.addEventListener('fullscreenchange', function(){ fb.textContent = document.fullscreenElement ? '離開全螢幕' : '全螢幕'; });
-  }
-  document.addEventListener('visibilitychange', function(){
-    if (!document.hidden && tm.running && navigator.wakeLock && !lock) navigator.wakeLock.request('screen').then(function(l){ lock = l; }).catch(function(){});
-  });
-
   /* ---------- boot ---------- */
-  render();
   show((location.hash || '').slice(1) || 'sim', false);
   requestAnimationFrame(frame);
 })();
