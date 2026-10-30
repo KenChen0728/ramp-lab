@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>胡桃鉗下坡實驗室</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* Layout: classroom projector tool — header with three tabs; each view is one big stage, controls in a side panel on wide screens, stacked on phones */
+:root{
+  --snow:#EDF1F6; --paper:#FBFCFD; --ink:#1E2A44; --ink-soft:#4F5B70; --line:#D3DAE4;
+  --coat:#B5372F; --on-coat:#FFF8F2; --brass:#94691A; --brass-fill:#E2B659; --brass-soft:#F6ECD0;
+  --ramp:#E7DBC5; --ramp-edge:#A88B60; --wood:#EDD4A7; --wood-back:#D9BC8C; --wood-edge:#7E5228;
+  --hat:#22304F; --face:#F3D9BC; --cg:#2E6DA4; --focus:#2E6DA4;
+  --mat-ice:#BEE0F3; --mat-shine:#F4FBFF; --mat-paper:#E6CB9C; --mat-paper-line:#B48A55;
+  --mat-felt:#97A3B2; --mat-fleck:#6D7888; --mat-grip:#9EA3AB; --mat-grip-dot:#5E636B;
+  --good:#2A7548; --good-bg:#E1F0E6; --warn:#8F5C00; --warn-bg:#FAEDCF;
+  --bad:#B5372F; --bad-bg:#F7DFDB; --slide:#2B649A; --slide-bg:#DCE9F5;
+  --display:"LXGW WenKai TC","Noto Sans TC",Georgia,serif;
+  --body:"Noto Sans TC",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+  --radius:16px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --snow:#0F1726; --paper:#172238; --ink:#ECEFF5; --ink-soft:#A9B3C6; --line:#2A3752;
+  --coat:#E3685C; --on-coat:#1C0E0C; --brass:#E2B659; --brass-fill:#E2B659; --brass-soft:#352C18;
+  --ramp:#3B3427; --ramp-edge:#7A6849; --wood:#DDBD8A; --wood-back:#B8986A; --wood-edge:#5E3C1B;
+  --hat:#141C2E; --face:#EFD3B4; --cg:#7DB2E2; --focus:#7DB2E2;
+  --good:#71C694; --good-bg:#16301F; --warn:#E8B95C; --warn-bg:#382B11;
+  --bad:#F08B80; --bad-bg:#3A1C19; --slide:#83B6E4; --slide-bg:#15283B;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --snow:#0F1726; --paper:#172238; --ink:#ECEFF5; --ink-soft:#A9B3C6; --line:#2A3752;
+  --coat:#E3685C; --on-coat:#1C0E0C; --brass:#E2B659; --brass-fill:#E2B659; --brass-soft:#352C18;
+  --ramp:#3B3427; --ramp-edge:#7A6849; --wood:#DDBD8A; --wood-back:#B8986A; --wood-edge:#5E3C1B;
+  --hat:#141C2E; --face:#EFD3B4; --cg:#7DB2E2; --focus:#7DB2E2;
+  --good:#71C694; --good-bg:#16301F; --warn:#E8B95C; --warn-bg:#382B11;
+  --bad:#F08B80; --bad-bg:#3A1C19; --slide:#83B6E4; --slide-bg:#15283B;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--snow);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:1280px;margin-inline:auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3,p{margin:0}
+button,input,label{font:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.14em;color:var(--coat)}
+h1{font-family:var(--display);font-size:clamp(28px,3.6vw,42px);line-height:1.15;font-weight:700;text-wrap:balance}
+.tabs{display:flex;gap:4px;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:5px;max-width:100%;overflow-x:auto}
+.tab{border:0;background:transparent;color:var(--ink-soft);font-size:16px;font-weight:500;padding:8px 18px;border-radius:999px;white-space:nowrap}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--paper)}
+.tab:hover:not([aria-selected="true"]){color:var(--ink)}
+
+/* simulator */
+.sim{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
+.stage{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;min-width:0}
+#scene{display:block;width:100%;aspect-ratio:16/10;max-width:100%}
+.stage-foot{display:flex;flex-wrap:wrap;gap:6px 20px;padding:12px 16px;border-top:1px solid var(--line);font-size:14px;color:var(--ink-soft)}
+.key{display:inline-flex;align-items:center;gap:8px}
+.key i{display:inline-block;flex:none}
+.k-cg{width:12px;height:12px;border-radius:50%;background:var(--cg)}
+.k-g{width:22px;border-top:2px dashed var(--cg)}
+.k-pv{width:14px;height:14px;border-radius:50%;border:2px dashed var(--coat)}
+.stage-note{flex-basis:100%;font-size:13px}
+.panel{display:flex;flex-direction:column;gap:16px;min-width:0}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;gap:20px}
+.control{display:flex;flex-direction:column;gap:8px;border:0;padding:0;margin:0;min-width:0}
+.control-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.control-head label,.control legend{font-weight:700;font-size:16px;padding:0}
+output{font-family:var(--display);font-size:24px;font-weight:700;color:var(--coat);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--coat);margin:4px 0}
+.scale-labels{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-soft)}
+.presets{display:flex;gap:8px}
+.chipbtn{flex:1;border:1px solid var(--line);background:var(--snow);color:var(--ink);border-radius:10px;padding:6px 8px;font-size:15px}
+.chipbtn:hover{border-color:var(--ink-soft)}
+.seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
+.seg input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.seg label{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--snow);border-radius:10px;padding:9px 12px;cursor:pointer;font-size:15px}
+.seg label .sw{width:18px;height:18px;border-radius:5px;flex:none;border:1px solid var(--line)}
+.seg input:checked + label{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.seg input:focus-visible + label{outline:3px solid var(--focus);outline-offset:2px}
+.checks{display:flex;flex-direction:column;gap:8px;font-size:15px}
+.checks label{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.checks input{accent-color:var(--coat);width:18px;height:18px;margin-top:3px;flex:none}
+.btn{border:0;background:var(--coat);color:var(--on-coat);border-radius:12px;padding:12px 18px;font-size:17px;font-weight:700}
+.btn:hover{filter:brightness(1.06)}
+.btn.ghost{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
+
+.result{border-radius:var(--radius);padding:18px 20px;border:2px solid var(--line);background:var(--paper);display:flex;flex-direction:column;gap:8px}
+.result .label{font-size:13px;font-weight:700;letter-spacing:.14em;color:var(--ink-soft)}
+.result .verdict{font-family:var(--display);font-size:36px;font-weight:700;line-height:1.2}
+.result .why{font-size:16px}
+.result .try{font-size:15px;color:var(--ink-soft)}
+.result[data-kind="walk"]{border-color:var(--good);background:var(--good-bg)}
+.result[data-kind="walk"] .verdict{color:var(--good)}
+.result[data-kind="stutter"]{border-color:var(--warn);background:var(--warn-bg)}
+.result[data-kind="stutter"] .verdict{color:var(--warn)}
+.result[data-kind="slide"]{border-color:var(--slide);background:var(--slide-bg)}
+.result[data-kind="slide"] .verdict{color:var(--slide)}
+.result[data-kind="tip"]{border-color:var(--bad);background:var(--bad-bg)}
+.result[data-kind="tip"] .verdict{color:var(--bad)}
+.result[data-kind="pending"] .verdict{color:var(--ink-soft)}
+
+.conv{gap:12px}
+.conv-title{font-weight:700;font-size:16px}
+.conv-grid{display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:10px 12px;align-items:center}
+.conv-grid label{font-size:15px;display:flex;gap:6px;align-items:baseline}
+.conv-grid .unit{font-size:13px;color:var(--ink-soft)}
+.conv-grid input{width:100%;font-size:17px;padding:6px 10px;border:1px solid var(--line);border-radius:10px;background:var(--snow);color:var(--ink);font-variant-numeric:tabular-nums}
+.conv-out{font-size:16px}
+.conv-note{font-size:14px;color:var(--ink-soft)}
+
+/* secrets */
+.secrets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.secret{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:20px 20px 24px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.secret video{width:100%;height:auto;aspect-ratio:16/10;object-fit:contain;display:block;background:#FBF8F2;border-radius:12px;border:1px solid var(--line)}
+.secret .num{font-size:13px;font-weight:700;letter-spacing:.14em;color:var(--coat)}
+.secret h2{font-family:var(--display);font-size:32px;line-height:1.2}
+.secret p{font-size:17px}
+.secret .where{margin-top:auto;padding-top:10px;border-top:1px dashed var(--line);font-size:15px;color:var(--ink-soft)}
+.secret .where b{color:var(--brass)}
+.reveal{display:flex;flex-direction:column;align-items:center;gap:14px;padding:12px 0 4px;text-align:center}
+.answer{font-family:var(--display);font-size:clamp(36px,6vw,64px);font-weight:700;color:var(--coat);line-height:1.2;text-wrap:balance}
+.answer-sub{font-size:18px;color:var(--ink-soft)}
+.s-edge{stroke:var(--wood-edge)}
+.s-ink{stroke:var(--ink)}
+.f-wood{fill:var(--wood)}
+.f-coat{fill:var(--coat)}
+.f-face{fill:var(--face)}
+.f-hat{fill:var(--hat)}
+.f-none{fill:none}
+.ground{stroke:var(--ramp-edge)}
+.guide{stroke:var(--line)}
+.ring{stroke:var(--coat);fill:none}
+.ring-label{fill:var(--coat);font-family:var(--body);font-size:12px;font-weight:700}
+.swing{transform-box:view-box;transform-origin:120px 26px;animation:swing 1.4s ease-in-out infinite alternate}
+@keyframes swing{from{transform:rotate(-26deg)}to{transform:rotate(26deg)}}
+.rocker{transform-box:view-box;transform-origin:120px 22px;animation:rock 1.5s ease-in-out infinite alternate}
+@keyframes rock{from{transform:rotate(-8deg)}to{transform:rotate(8deg)}}
+.pivot-front{transform-box:view-box;transform-origin:150px 176px;animation:pf 2.4s ease-in-out infinite}
+.pivot-rear{transform-box:view-box;transform-origin:90px 176px;animation:pr 2.4s ease-in-out infinite}
+@keyframes pf{0%{transform:rotate(0)}25%{transform:rotate(9deg)}50%,100%{transform:rotate(0)}}
+@keyframes pr{0%,50%{transform:rotate(0)}75%{transform:rotate(-9deg)}100%{transform:rotate(0)}}
+.ring-a{animation:ra 2.4s steps(1,end) infinite}
+.ring-b{animation:rb 2.4s steps(1,end) infinite}
+@keyframes ra{0%{opacity:1}50%{opacity:0}}
+@keyframes rb{0%{opacity:0}50%{opacity:1}}
+
+/* timer */
+.timer{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:32px 20px 36px;display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center}
+.timer-name{font-family:var(--display);font-size:clamp(28px,4vw,44px);font-weight:700}
+.digits{font-family:var(--body);font-weight:700;font-size:clamp(84px,19vw,240px);line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.timer.done .digits{color:var(--coat)}
+.timer-sub{font-size:18px;color:var(--ink-soft);min-height:1.6em}
+.row{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.row .chipbtn{flex:0 1 auto;padding:10px 18px;font-size:17px}
+.row .chipbtn[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+#view-timer:fullscreen{background:var(--snow);display:flex;align-items:center;justify-content:center;padding:24px}
+#view-timer:fullscreen .timer{width:100%;max-width:1400px;border:0}
+
+@media (max-width:900px){
+  .sim{grid-template-columns:1fr}
+  .secrets{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  .swing,.rocker,.pivot-front,.pivot-rear,.ring-a,.ring-b{animation:none}
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">國圖冬季講堂・胡桃鉗士兵下坡記</p>
+      <h1>胡桃鉗下坡實驗室</h1>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="切換頁面">
+      <button class="tab" role="tab" id="tab-sim" data-target="sim" aria-controls="view-sim" aria-selected="true" type="button">下坡模擬器</button>
+      <button class="tab" role="tab" id="tab-secrets" data-target="secrets" aria-controls="view-secrets" aria-selected="false" type="button">三個秘密</button>
+      <button class="tab" role="tab" id="tab-timer" data-target="timer" aria-controls="view-timer" aria-selected="false" type="button">計時器</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="view-sim" data-view="sim" role="tabpanel" aria-labelledby="tab-sim">
+      <div class="sim">
+        <div class="stage">
+          <canvas id="scene" role="img" aria-label="士兵騎馬下坡的示意動畫"></canvas>
+          <div class="stage-foot">
+            <span class="key"><i class="k-cg"></i>重心</span>
+            <span class="key"><i class="k-g"></i>重力往下拉的方向</span>
+            <span class="key"><i class="k-pv"></i>支點：現在撐住身體的腳</span>
+            <span class="stage-note">示意動畫：角度門檻是為了教學設定的，真實結果請在坡道上實測。</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="card">
+            <div class="control">
+              <div class="control-head"><label for="slope">坡度</label><output id="slopeOut" for="slope">13°</output></div>
+              <input type="range" id="slope" min="0" max="30" step="1" value="13">
+              <div class="presets">
+                <button class="chipbtn" type="button" data-angle="13">13°</button>
+                <button class="chipbtn" type="button" data-angle="17">17°</button>
+                <button class="chipbtn" type="button" data-angle="21">21°</button>
+              </div>
+            </div>
+            <div class="control">
+              <div class="control-head"><label for="rider">士兵位置</label><output id="riderOut" for="rider">刻度 6</output></div>
+              <input type="range" id="rider" min="1" max="7" step="0.5" value="6">
+              <div class="scale-labels"><span>馬尾 1</span><span>7 馬頭</span></div>
+            </div>
+            <fieldset class="control">
+              <legend>地面</legend>
+              <div class="seg">
+                <input type="radio" name="surface" id="surf-paper" value="paper"><label for="surf-paper"><span class="sw" style="background:var(--mat-paper)"></span>木板</label>
+                <input type="radio" name="surface" id="surf-grip" value="grip" checked><label for="surf-grip"><span class="sw" style="background:var(--mat-grip)"></span>砂紙</label>
+              </div>
+            </fieldset>
+            <fieldset class="control">
+              <legend>坡道</legend>
+              <div class="seg">
+                <input type="radio" name="len" id="len-short" value="short"><label for="len-short">桌上短坡道</label>
+                <input type="radio" name="len" id="len-long" value="long" checked><label for="len-long">前面長坡道</label>
+              </div>
+            </fieldset>
+            <div class="checks">
+              <label for="showCg"><input type="checkbox" id="showCg" checked>顯示重心和重力線</label>
+              <label for="guess" hidden style="display:none"><input type="checkbox" id="guess">先猜再看：走完才顯示結果</label>
+            </div>
+            <button class="btn" id="replay" type="button">重新放上坡道</button>
+          </div>
+
+          <div class="result" id="result" data-kind="pending" aria-live="polite" hidden style="display:none">
+            <p class="label">結果</p>
+            <p class="verdict" id="resVerdict">？</p>
+            <p class="why" id="resWhy">看看它會怎麼走……先猜猜看！</p>
+            <p class="try" id="resTry"></p>
+          </div>
+
+          <div class="card conv">
+            <p class="conv-title">書本高度換算角度</p>
+            <div class="conv-grid">
+              <label for="rampLen">坡道板長度<span class="unit">公分</span></label>
+              <input type="number" id="rampLen" min="1" step="0.5" value="60" inputmode="decimal">
+              <label for="rampHeight">書疊總高度<span class="unit">公分</span></label>
+              <input type="number" id="rampHeight" min="0" step="0.5" value="10" inputmode="decimal">
+            </div>
+            <p class="conv-out">大約 <output id="convOut" for="rampLen rampHeight">9.6°</output></p>
+            <p class="conv-note" id="convNote">量坡道板的長度，和墊高那一端的書疊高度。</p>
+            <button class="btn ghost" id="convApply" type="button">套用到模擬器</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-secrets" data-view="secrets" role="tabpanel" aria-labelledby="tab-secrets" hidden>
+      <div class="secrets">
+        <article class="secret">
+          <video src="media/secret1.mp4" autoplay muted loop playsinline aria-label="筷子模型示範跨、站、跟三個動作"></video>
+          <p class="num">秘密 1</p>
+          <h2>跨、站、跟</h2>
+          <p>前腳先跨出去，身體站到前腳上，後腳再跟上來。兩隻腳輪流撐住身體，就一步一步往前走。</p>
+          <p class="where"><b>在木馬身上：</b>前腳踏出去，後腳像鐘擺一樣盪過來跟上。</p>
+        </article>
+        <article class="secret">
+          <video src="media/secret2.mp4" autoplay muted loop playsinline aria-label="企鵝在冰面滑到底、在草地卡住"></video>
+          <p class="num">秘密 2</p>
+          <h2>地面要抓得住</h2>
+          <p>冰面很滑，企鵝一路滑下去；草地很粗糙，把企鵝抓住。抓住你的力量，叫做摩擦力。</p>
+          <p class="where"><b>在木馬身上：</b>坡道貼了砂紙，讓地面抓住木馬的腳。</p>
+        </article>
+        <article class="secret">
+          <video src="media/secret3.mp4" autoplay muted loop playsinline aria-label="士兵坐太前面會翻倒、太後面會卡住、坐剛好才能走下去"></video>
+          <p class="num">秘密 3</p>
+          <h2>士兵要坐對位置</h2>
+          <p>士兵坐太前面，木馬會往前翻；太後面，走一步就卡住；坐剛好，才能一步一步走下去。</p>
+          <p class="where"><b>在木馬身上：</b>移動士兵，就是在調整重心。</p>
+        </article>
+      </div>
+      <div class="reveal">
+        <button class="btn" id="revealBtn" type="button" aria-expanded="false" aria-controls="answer">揭曉：小馬的電池是什麼？</button>
+        <div id="answer" hidden>
+          <p class="answer">重力是它的電池</p>
+          <p class="answer-sub">跨站跟、地面抓得住、士兵坐對位置，讓它一步一步走下山，不滑也不翻。</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-timer" data-view="timer" role="tabpanel" aria-labelledby="tab-timer" hidden>
+      <div class="timer" id="timerBox">
+        <p class="timer-name" id="tName">休息時間</p>
+        <p class="digits" id="tDigits" role="timer" aria-live="off">15:00</p>
+        <p class="timer-sub" id="tSub">按「開始」倒數</p>
+        <div class="row">
+          <button class="btn" id="tStart" type="button">開始</button>
+          <button class="btn ghost" id="tAdd" type="button">加 1 分鐘</button>
+          <button class="btn ghost" id="tReset" type="button">重設</button>
+          <button class="btn ghost" id="tFull" type="button" hidden>全螢幕</button>
+        </div>
+        <div class="row" id="tPresets">
+          <button class="chipbtn" type="button" data-min="30" data-name="著色時間" aria-pressed="false">著色 30 分</button>
+          <button class="chipbtn" type="button" data-min="15" data-name="休息時間" aria-pressed="true">休息 15 分</button>
+          <button class="chipbtn" type="button" data-min="10" data-name="休息時間" aria-pressed="false">休息 10 分</button>
+          <button class="chipbtn" type="button" data-min="5" data-name="倒數 5 分鐘" aria-pressed="false">5 分鐘</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var reduce = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : {matches:false};
+
+  /* ---------- tabs ---------- */
+  var VIEWS = ['sim','secrets','timer'];
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  function show(v, write){
+    if (VIEWS.indexOf(v) < 0) v = 'sim';
+    document.querySelectorAll('[data-view]').forEach(function(s){ s.hidden = s.dataset.view !== v; });
+    tabs.forEach(function(b){ var on = b.dataset.target === v; b.setAttribute('aria-selected', on ? 'true' : 'false'); b.tabIndex = on ? 0 : -1; });
+    if (write) { try { history.replaceState(null, '', '#' + v); } catch (e) {} }
+    if (v === 'sim') { sizeCanvas(); restart(); }
+  }
+  tabs.forEach(function(b, i){
+    b.addEventListener('click', function(){ show(b.dataset.target, true); });
+    b.addEventListener('keydown', function(e){
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      var n = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+      n.focus(); show(n.dataset.target, true);
+    });
+  });
+
+  /* ---------- simulator ---------- */
+  var cv = $('scene'), ctx = cv.getContext('2d');
+  var W = 0, H = 0, dpr = 1;
+  function sizeCanvas(){
+    var r = cv.getBoundingClientRect();
+    if (!r.width) return;
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = r.width; H = r.height;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  }
+  if (window.ResizeObserver) new ResizeObserver(sizeCanvas).observe(cv);
+  window.addEventListener('resize', sizeCanvas);
+
+  var D2R = Math.PI / 180;
+  var LEG = 85, RP = {x:-80, y:-85}, ALPHA = 30 * D2R, STRIDE = LEG * Math.sin(ALPHA), ROCK = 7 * D2R, TIP = 55 * D2R;
+  var SURF = { ice:{name:'玻璃', mu:0.12}, paper:{name:'木板', mu:0.35}, felt:{name:'毛氈布', mu:0.55}, grip:{name:'砂紙', mu:0.75} };
+  var st = { theta:13, p:16.67, s:6, surface:'grip', cg:true, guess:false, len:'long' };
+  function s2p(v){ return (7 - v) / 6 * 100; }
+  var run = null, revealedKey = '', restartTimer = 0;
+
+  function riderU(p){ return 15 - 1.1 * p; }
+  function riderWord(){ return '刻度 ' + st.s; }
+  function key(){ return st.theta + '|' + st.p + '|' + st.surface + '|' + st.len; }
+  document.querySelectorAll('input[name=len]').forEach(function(r){ r.addEventListener('change', function(){ if (r.checked) { st.len = r.value; if (typeof restart === 'function') restart(); } }); });
+
+  function evaluate(){
+    var mu = SURF[st.surface].mu, t = Math.tan(st.theta * D2R);
+    // fitted to measured long-ramp results (sandpaper): stuck below tMin, tips above tTip
+    function lerp(pts, x){ for (var i = 0; i < pts.length - 1; i++) { var a = pts[i], b = pts[i+1]; if (x <= b[0] || i === pts.length - 2) return a[1] + (x - a[0]) * (b[1] - a[1]) / (b[0] - a[0]); } }
+    var wood = st.surface === 'paper';
+    var tMin = wood ? lerp([[2,17],[4.75,13]], st.s) : lerp([[0.5,21],[2.75,17],[5.25,13]], st.s);
+    var tTip = wood ? lerp([[6.25,17],[7.5,13]], st.s) : lerp([[2.7,21],[4.9,17],[7,13.6]], st.s);
+    if (st.theta < 2) return {kind:'stutter', reason:'flat'};
+    if (t > mu) return {kind:'slide', reason: st.surface === 'ice' ? 'ice' : 'rough'};
+    if (st.theta > tTip) return {kind:'tip', reason: st.s > 3 ? 'front' : 'steep'};
+    if (st.theta < tMin) return {kind:'stutter', reason: st.s < 4 ? 'back' : 'gentle'};
+    return {kind:'walk', fast: st.surface === 'paper', bumpy: wood ? st.s < 3.75 : tTip - st.theta < 0.63};
+  }
+
+  var VERDICT = { walk:'走得順', stutter:'卡住', slide:'滑下去', tip:'往前倒' };
+  function explain(ev){
+    switch (ev.kind) {
+      case 'walk': return ev.fast ? ['木板比砂紙滑，腳每一步都微微滑一點，所以走得比較快。', '試試看：坡再陡一點，木板還抓得住嗎？'] : ['坡度、士兵位置和地面都剛好。前腳、後腳輪流當支點，一步一步走到坡底。', '試試看：坡變陡了，士兵要往哪邊移？'];
+      case 'slide': return [ev.reason === 'ice' ? '玻璃太滑了，腳抓不住地面，整隻直接滑下去，沒有一步一步走。' : '坡太陡、木板又不夠粗，腳抓不住，整隻直接滑下去。', '試試看：換成砂紙，或把坡度調小。'];
+      case 'tip': return [ev.reason === 'front' ? '士兵坐太前面，重心跑到前腳前面，一走就往前倒。' : '坡太陡，身體往前倒得太快，後腳來不及接住。', ev.reason === 'front' ? '試試看：把士兵往馬尾移一點（數字變小）。' : '試試看：把坡度調小一點。'];
+      default:
+        if (ev.reason === 'flat') return ['幾乎是平地，沒有重力往下拉，搖一搖就停了。', '試試看：把坡度調高一點。'];
+        if (ev.reason === 'back') return ['士兵坐太後面，身體往後坐，走一步就卡住了。', '試試看：把士兵往馬頭移一點（數字變大）。'];
+        return ['坡度有點不夠，走兩步就停下來。', '試試看：坡度再調高一點點。'];
+    }
+  }
+  function showResult(ev){
+    var box = $('result'), ex = explain(ev);
+    box.dataset.kind = ev.kind;
+    $('resVerdict').textContent = ev.bumpy ? '走下去了，但不太順' : VERDICT[ev.kind];
+    $('resWhy').textContent = ex[0];
+    $('resTry').textContent = ex[1];
+  }
+  function hideResult(){
+    $('result').dataset.kind = 'pending';
+    $('resVerdict').textContent = '？';
+    $('resWhy').textContent = '看看它會怎麼走……先猜猜看！';
+    $('resTry').textContent = '';
+  }
+
+  function geom(){
+    var k = W / 1000, th = st.theta * D2R, c = Math.cos(th), s = Math.sin(th);
+    var baseY = H * 0.9, ex = W * 0.94, topMin = 258 * k;
+    var Lr = 0.86 * W / c;
+    if (s > 1e-6) Lr = Math.min(Lr, (baseY - topMin) / s);
+    if (st.len === 'short') Lr *= 0.62;
+    return { k:k, th:th, c:c, s:s, baseY:baseY, A:{x:ex - Lr * c, y:baseY - Lr * s}, B:{x:ex, y:baseY}, Lr:Lr, Lu: k > 0 ? Lr / k : 0 };
+  }
+
+  function restart(){
+    var g = geom(), ev = evaluate();
+    var T = Math.min(0.8, Math.max(0.45, 0.75 - (st.theta - 6) * 0.015));
+    var s0 = 100, sEnd = Math.max(s0 + STRIDE, g.Lu - 40);
+    run = { ev:ev, T:T, s0:s0, sEnd:sEnd, start:performance.now(), done:false, loopAt:0 };
+    run.nSteps = Math.max(1, Math.floor((sEnd - s0) / STRIDE));
+    run.steps = ev.reason === 'flat' ? 0 : ev.reason === 'back' ? 1 : 2;
+    run.D = Math.min(3.2, Math.max(1.6, 3.2 - (st.theta - 8) * 0.06));
+    run.pre = ev.reason === 'front' ? 0.5 * T : T;
+    if (ev.kind === 'walk') {
+      // measured on the long ramp: sandpaper ~9.9 s at 13°, ~9.1 s at 17°, ~8.7 s at 21°; wood ~2.5 s at 13°, ~1.6 s at 17°
+      var real = ev.fast ? Math.max(1.2, 2.5 - (st.theta - 13) * 0.22) : Math.max(7.5, 9.9 - (st.theta - 13) * 0.15);
+      if (ev.bumpy) real += ev.fast ? 0.9 : 0.8;
+      if (st.len === 'short') real *= 0.62;
+      run.real = real; run.T = T = real / run.nSteps;
+    }
+    if (ev.kind === 'walk') run.dur = run.nSteps * T;
+    else if (ev.kind === 'stutter') run.dur = run.steps * T + 1.8;
+    else if (ev.kind === 'slide') run.dur = run.D;
+    else run.dur = run.pre + 1.2;
+    if (!st.guess || revealedKey === key()) showResult(ev); else hideResult();
+    cv.setAttribute('aria-label', '示意動畫：坡度 ' + st.theta + ' 度，士兵在' + riderWord(st.p) + '，地面是' + SURF[st.surface].name);
+  }
+  function scheduleRestart(){ clearTimeout(restartTimer); restartTimer = setTimeout(restart, 220); }
+
+  function walkPose(t){
+    var n = Math.floor(t / run.T), f = t / run.T - n, base = run.s0 + n * STRIDE, g, a;
+    if (f < 0.5) { g = f / 0.5; return { s:base, phi:ROCK * Math.sin(Math.PI * g), alpha:ALPHA * (1 - Math.cos(Math.PI * g)) / 2, pivot:'front' }; }
+    g = (f - 0.5) / 0.5; a = ALPHA * (1 + Math.cos(Math.PI * g)) / 2;
+    return { s:base + LEG * (Math.sin(ALPHA) - Math.sin(a)), phi:-ROCK * 0.6 * Math.sin(Math.PI * g), alpha:a, pivot:'rear' };
+  }
+  function pose(t){
+    var kind = run.ev.kind, u, tt;
+    if (kind === 'walk') {
+      if (t >= run.dur) return { s:run.s0 + run.nSteps * STRIDE, phi:0, alpha:0, pivot:'front' };
+      return walkPose(t);
+    }
+    if (kind === 'stutter') {
+      var tw = run.steps * run.T;
+      if (t < tw) return walkPose(t);
+      u = t - tw;
+      return { s:run.s0 + run.steps * STRIDE, phi:ROCK * 0.55 * Math.exp(-u * 2.2) * Math.sin(2 * Math.PI * u / run.T), alpha:0, pivot:'front' };
+    }
+    if (kind === 'slide') {
+      tt = Math.min(t, run.D) / run.D;
+      return { s:run.s0 + (run.sEnd - run.s0) * tt * tt, phi:0, alpha:0, pivot:'none' };
+    }
+    if (t < run.pre) return walkPose(t);
+    u = t - run.pre;
+    var full = run.pre >= run.T, phi;
+    if (u < 0.6) phi = TIP * (u / 0.6) * (u / 0.6);
+    else phi = TIP - 4 * D2R * Math.exp(-(u - 0.6) * 7) * Math.abs(Math.sin((u - 0.6) * 18));
+    return { s:run.s0 + (full ? STRIDE : 0), phi:phi, alpha: full ? 0 : ALPHA, pivot:'front' };
+  }
+
+  function rearFoot(a){ return { x:RP.x + LEG * Math.sin(a), y:RP.y + LEG * Math.cos(a) }; }
+  function pivotPt(ps){ return ps.pivot === 'rear' ? rearFoot(ps.alpha) : {x:0, y:0}; }
+  function slopePoint(g, s){ return { x:g.A.x + s * g.k * g.c, y:g.A.y + s * g.k * g.s }; }
+  function toWorld(pt, ps, g){
+    var pv = pivotPt(ps), dx = pt.x - pv.x, dy = pt.y - pv.y, cp = Math.cos(ps.phi), sp = Math.sin(ps.phi);
+    var qx = pv.x + dx * cp - dy * sp, qy = pv.y + dx * sp + dy * cp, S = slopePoint(g, ps.s);
+    return { x:S.x + g.k * (qx * g.c - qy * g.s), y:S.y + g.k * (qx * g.s + qy * g.c) };
+  }
+
+  function pal(){
+    var cs = getComputedStyle(document.documentElement);
+    function v(n){ return cs.getPropertyValue(n).trim(); }
+    return { paper:v('--paper'), snow:v('--snow'), line:v('--line'), ink:v('--ink'), soft:v('--ink-soft'),
+      ramp:v('--ramp'), rampEdge:v('--ramp-edge'), wood:v('--wood'), woodBack:v('--wood-back'), woodEdge:v('--wood-edge'),
+      hat:v('--hat'), face:v('--face'), coat:v('--coat'), brass:v('--brass-fill'), cg:v('--cg'),
+      mat:{ ice:v('--mat-ice'), paper:v('--mat-paper'), felt:v('--mat-felt'), grip:v('--mat-grip') },
+      shine:v('--mat-shine'), paperLine:v('--mat-paper-line'), fleck:v('--mat-fleck'), gripDot:v('--mat-grip-dot') };
+  }
+  function rr(x, y, w, h, r){
+    ctx.beginPath();
+    ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
+  }
+  function line(x1, y1, x2, y2){ ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); }
+  function limb(x1, y1, x2, y2, fill, P){
+    ctx.strokeStyle = P.woodEdge; ctx.lineWidth = 16; line(x1, y1, x2, y2);
+    ctx.strokeStyle = fill; ctx.lineWidth = 11; line(x1, y1, x2, y2);
+  }
+
+  function drawHorse(ps, P){
+    var ru = riderU(st.p), f = rearFoot(ps.alpha);
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    var TWO = Math.PI * 2;
+    function fillStroke(fill){ ctx.fillStyle = fill; ctx.fill(); ctx.strokeStyle = P.woodEdge; ctx.lineWidth = 2.5; ctx.stroke(); }
+    // tail: a soft rounded tuft behind the body
+    ctx.beginPath(); ctx.moveTo(-104, -122);
+    ctx.bezierCurveTo(-140, -132, -150, -100, -132, -84);
+    ctx.bezierCurveTo(-124, -96, -116, -104, -104, -100); ctx.closePath(); fillStroke(P.woodBack);
+    limb(RP.x, RP.y, f.x, f.y, P.woodBack, P);
+    // body
+    rr(-110, -128, 150, 48, 22); fillStroke(P.wood);
+    limb(0, -92, 0, 0, P.wood, P);
+    // ear (behind the head)
+    ctx.beginPath(); ctx.moveTo(44, -186); ctx.lineTo(46, -210); ctx.lineTo(60, -192); ctx.closePath(); fillStroke(P.wood);
+    // mane: a row of rounded tabs along the back of the neck
+    [[6, -128], [12, -144], [20, -159], [29, -173], [39, -186]].forEach(function(m){
+      ctx.beginPath(); ctx.arc(m[0] - 7, m[1], 9, 0, TWO); fillStroke(P.woodBack);
+    });
+    // neck
+    ctx.beginPath(); ctx.moveTo(6, -124); ctx.lineTo(38, -186); ctx.lineTo(68, -176); ctx.lineTo(40, -104);
+    ctx.quadraticCurveTo(26, -96, 6, -124); ctx.closePath(); fillStroke(P.wood);
+    // head + muzzle
+    ctx.beginPath(); ctx.ellipse(62, -178, 26, 18, -0.15, 0, TWO); fillStroke(P.wood);
+    ctx.beginPath(); ctx.ellipse(88, -168, 17, 13, -0.1, 0, TWO); fillStroke(P.wood);
+    // hide the seam between head and muzzle
+    ctx.beginPath(); ctx.ellipse(74, -173, 14, 12, 0, 0, TWO); ctx.fillStyle = P.wood; ctx.fill();
+    // eye, nostril, smile
+    ctx.fillStyle = P.hat;
+    ctx.beginPath(); ctx.arc(66, -184, 3.8, 0, TWO); ctx.fill();
+    ctx.beginPath(); ctx.arc(97, -170, 2.2, 0, TWO); ctx.fill();
+    ctx.strokeStyle = P.woodEdge; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(86, -166, 8, 0.25 * Math.PI, 0.7 * Math.PI); ctx.stroke();
+    ctx.fillStyle = P.paper; ctx.strokeStyle = P.ink; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(RP.x, RP.y, 5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    // soldier
+    ctx.strokeStyle = P.hat; ctx.lineWidth = 7; line(ru + 2, -128, ru + 10, -104);
+    rr(ru - 14, -172, 28, 46, 6); ctx.fillStyle = P.coat; ctx.fill(); ctx.strokeStyle = P.woodEdge; ctx.lineWidth = 2; ctx.stroke();
+    ctx.strokeStyle = P.brass; ctx.lineWidth = 4; ctx.lineCap = 'butt'; line(ru - 13, -146, ru + 13, -146); ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.arc(ru, -186, 13, 0, Math.PI * 2); ctx.fillStyle = P.face; ctx.fill(); ctx.strokeStyle = P.woodEdge; ctx.lineWidth = 2; ctx.stroke();
+    ctx.strokeStyle = P.woodEdge; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(ru - 2, -180); ctx.quadraticCurveTo(ru + 5, -176, ru + 11, -181); ctx.stroke();
+    ctx.fillStyle = P.hat; ctx.beginPath(); ctx.arc(ru + 6, -190, 2, 0, Math.PI * 2); ctx.fill();
+    rr(ru - 12, -228, 24, 34, 4); ctx.fillStyle = P.hat; ctx.fill(); ctx.strokeStyle = P.woodEdge; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = P.brass; ctx.fillRect(ru - 12, -203, 24, 5);
+    ctx.fillStyle = P.coat; ctx.beginPath(); ctx.arc(ru, -232, 5, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function drawSurface(g, P){
+    var n = {x:-g.s, y:g.c}, d = {x:g.c, y:g.s}, tk = 8 * g.k, A = g.A, B = g.B, x, i;
+    ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y); ctx.lineTo(B.x + n.x * tk, B.y + n.y * tk); ctx.lineTo(A.x + n.x * tk, A.y + n.y * tk); ctx.closePath();
+    ctx.fillStyle = P.mat[st.surface]; ctx.fill(); ctx.strokeStyle = P.rampEdge; ctx.lineWidth = 1; ctx.stroke();
+    function at(dist, off){ return { x:A.x + d.x * dist + n.x * off, y:A.y + d.y * dist + n.y * off }; }
+    ctx.lineCap = 'round';
+    if (st.surface === 'ice') {
+      ctx.strokeStyle = P.shine; ctx.lineWidth = Math.max(1, 1.6 * g.k);
+      for (x = 20 * g.k, i = 0; x < g.Lr - 30 * g.k; x += 46 * g.k, i++) { var a = at(x, (2 + (i % 3)) * g.k), b = at(x + 20 * g.k, (2 + (i % 3)) * g.k); line(a.x, a.y, b.x, b.y); }
+    } else if (st.surface === 'paper') {
+      ctx.strokeStyle = P.paperLine; ctx.lineWidth = 1;
+      var p1 = at(0, 4 * g.k), p2 = at(g.Lr, 4 * g.k); line(p1.x, p1.y, p2.x, p2.y);
+    } else {
+      ctx.fillStyle = st.surface === 'felt' ? P.fleck : P.gripDot;
+      var step = (st.surface === 'felt' ? 7 : 11) * g.k;
+      for (x = 4 * g.k, i = 0; x < g.Lr - 4 * g.k; x += step, i++) {
+        var q = at(x, (st.surface === 'felt' ? (2 + (i * 7 % 5)) : 4) * g.k);
+        ctx.beginPath(); ctx.arc(q.x, q.y, Math.max(0.8, (st.surface === 'felt' ? 0.9 : 1.7) * g.k), 0, Math.PI * 2); ctx.fill();
+      }
+    }
+  }
+
+  function draw(ps){
+    if (!W) return;
+    var g = geom(), P = pal(), k = g.k, fs;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = P.paper; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = P.snow;
+    ctx.beginPath(); ctx.moveTo(0, H * 0.64); ctx.quadraticCurveTo(W * 0.24, H * 0.42, W * 0.5, H * 0.6); ctx.quadraticCurveTo(W * 0.74, H * 0.46, W, H * 0.58); ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = P.line; ctx.fillRect(0, g.baseY, W, H - g.baseY);
+    ctx.beginPath(); ctx.moveTo(g.A.x, g.A.y); ctx.lineTo(g.B.x, g.B.y); ctx.lineTo(g.A.x, g.baseY); ctx.closePath();
+    ctx.fillStyle = P.ramp; ctx.fill(); ctx.strokeStyle = P.rampEdge; ctx.lineWidth = Math.max(1, 1.5 * k); ctx.stroke();
+    drawSurface(g, P);
+    if (st.theta > 0) {
+      ctx.strokeStyle = P.ink; ctx.lineWidth = Math.max(1, 1.5 * k);
+      ctx.beginPath(); ctx.arc(g.B.x, g.B.y, 48 * k, Math.PI, Math.PI + g.th, false); ctx.stroke();
+    }
+    fs = Math.max(13, 22 * k);
+    ctx.font = '700 ' + fs + 'px "LXGW WenKai TC","Noto Sans TC",serif';
+    ctx.fillStyle = P.ink; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    ctx.fillText('坡度 ' + st.theta + '°', g.B.x, g.baseY + (H - g.baseY) / 2);
+    ctx.textAlign = 'left';
+    ctx.fillText('地面：' + SURF[st.surface].name, Math.max(12, 20 * k), g.baseY + (H - g.baseY) / 2);
+    if (run) {
+      var el = Math.min((performance.now() - run.start) / 1000, run.dur);
+      var txt = run.ev.kind === 'walk' ? '⏱ ' + el.toFixed(1) + ' 秒' : (run.done ? '⏱ × 沒走到底' : '⏱ ' + el.toFixed(1) + ' 秒');
+      ctx.font = '700 ' + Math.max(18, 34 * k) + 'px "Noto Sans TC",sans-serif';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.fillStyle = run.ev.kind === 'walk' ? P.ink : P.coat;
+      ctx.fillText(txt, Math.max(12, 24 * k), Math.max(12, 24 * k));
+    }
+
+    var S = slopePoint(g, ps.s), pv = pivotPt(ps);
+    ctx.save();
+    ctx.translate(S.x, S.y); ctx.rotate(g.th); ctx.scale(k, k);
+    ctx.translate(pv.x, pv.y); ctx.rotate(ps.phi); ctx.translate(-pv.x, -pv.y);
+    drawHorse(ps, P);
+    ctx.restore();
+
+    fs = Math.max(12, 15 * k);
+    ctx.font = '700 ' + fs + 'px "Noto Sans TC",sans-serif';
+    if (ps.pivot !== 'none') {
+      var pw = toWorld(pv, ps, g);
+      ctx.strokeStyle = P.coat; ctx.lineWidth = Math.max(1.5, 2.2 * k); ctx.setLineDash([4, 3]);
+      ctx.beginPath(); ctx.arc(pw.x, pw.y, Math.max(8, 14 * k), 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = P.coat; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillText('支點', pw.x, pw.y + Math.max(10, 18 * k));
+    }
+    if (st.cg) {
+      var ru = riderU(st.p);
+      var cgL = { x:(2 * -35 + 1.2 * ru) / 3.2, y:(2 * -104 + 1.2 * -165) / 3.2 };
+      var cw = toWorld(cgL, ps, g), ys;
+      if (cw.x >= g.A.x && cw.x <= g.B.x) ys = g.A.y + (cw.x - g.A.x) * Math.tan(g.th); else ys = g.baseY;
+      ctx.strokeStyle = P.cg; ctx.lineWidth = Math.max(1.5, 2 * k); ctx.setLineDash([6, 5]);
+      line(cw.x, cw.y, cw.x, ys); ctx.setLineDash([]);
+      ctx.fillStyle = P.cg; ctx.strokeStyle = P.paper; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(cw.x, cw.y, Math.max(5, 8 * k), 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = P.cg; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+      ctx.fillText('重心', cw.x - Math.max(9, 14 * k), cw.y);
+    }
+  }
+
+  function frame(now){
+    requestAnimationFrame(frame);
+    if (!W || $('view-sim').hidden || !run) return;
+    var t = (now - run.start) / 1000;
+    if (reduce.matches) t = run.dur;
+    if (!run.done && t >= run.dur) {
+      run.done = true; revealedKey = key(); showResult(run.ev);
+      run.loopAt = now + 2200;
+    }
+    if (run.done && !reduce.matches && now >= run.loopAt) { restart(); return; }
+    draw(pose(Math.min(t, run.dur)));
+  }
+
+  $('slope').addEventListener('input', function(e){ st.theta = +e.target.value; $('slopeOut').textContent = st.theta + '°'; scheduleRestart(); });
+  $('rider').addEventListener('input', function(e){ st.s = +e.target.value; st.p = s2p(st.s); $('riderOut').textContent = riderWord(); scheduleRestart(); });
+  document.querySelectorAll('input[name=surface]').forEach(function(r){ r.addEventListener('change', function(){ if (r.checked) { st.surface = r.value; restart(); } }); });
+  document.querySelectorAll('[data-angle]').forEach(function(b){ b.addEventListener('click', function(){ var s = $('slope'); s.value = b.dataset.angle; s.dispatchEvent(new Event('input')); }); });
+  $('showCg').addEventListener('change', function(e){ st.cg = e.target.checked; });
+  $('guess').addEventListener('change', function(e){ st.guess = e.target.checked; if (!st.guess && run) showResult(run.ev); });
+  $('replay').addEventListener('click', restart);
+
+  var convDeg = null;
+  function convert(){
+    var L = parseFloat($('rampLen').value), h = parseFloat($('rampHeight').value);
+    if (!(L > 0) || !(h >= 0)) { convDeg = null; $('convOut').textContent = '—'; $('convNote').textContent = '請填入長度和高度。'; return; }
+    if (h >= L) { convDeg = null; $('convOut').textContent = '—'; $('convNote').textContent = '書疊高度要比坡道板短。'; return; }
+    convDeg = Math.asin(h / L) / D2R;
+    $('convOut').textContent = convDeg.toFixed(1) + '°';
+    $('convNote').textContent = convDeg > 30 ? '超過 30°，模擬器最多只到 30°。' : '量坡道板的長度，和墊高那一端的書疊高度。';
+  }
+  $('rampLen').addEventListener('input', convert);
+  $('rampHeight').addEventListener('input', convert);
+  $('convApply').addEventListener('click', function(){
+    if (convDeg === null) return;
+    var s = $('slope'); s.value = Math.min(30, Math.round(convDeg)); s.dispatchEvent(new Event('input'));
+  });
+  convert();
+
+  /* ---------- secrets ---------- */
+  $('revealBtn').addEventListener('click', function(){
+    var a = $('answer'), open = a.hidden;
+    a.hidden = !open; this.setAttribute('aria-expanded', open ? 'true' : 'false');
+    this.textContent = open ? '收起答案' : '揭曉：小馬的電池是什麼？';
+  });
+
+  /* ---------- timer ---------- */
+  var tm = { total:900, left:900, running:false, endAt:0, iv:0 }, audio = null, lock = null;
+  function fmt(s){ var m = Math.floor(s / 60), r = s % 60; return (m < 10 ? '0' : '') + m + ':' + (r < 10 ? '0' : '') + r; }
+  function clock(ms){ var d = new Date(ms), h = d.getHours(), m = d.getMinutes(); return h + ':' + (m < 10 ? '0' : '') + m; }
+  function render(){
+    $('tDigits').textContent = fmt(tm.left);
+    $('tStart').textContent = tm.running ? '暫停' : (tm.left < tm.total && tm.left > 0 ? '繼續' : '開始');
+    if (tm.running) $('tSub').textContent = '預計 ' + clock(tm.endAt) + ' 結束';
+    else if (tm.left === 0) $('tSub').textContent = '時間到！請回到座位';
+    else if (tm.left < tm.total) $('tSub').textContent = '已暫停';
+    else $('tSub').textContent = '按「開始」倒數';
+    $('timerBox').classList.toggle('done', tm.left === 0);
+  }
+  function tick(){
+    tm.left = Math.max(0, Math.ceil((tm.endAt - Date.now()) / 1000));
+    if (tm.left === 0) finish();
+    render();
+  }
+  function chime(){
+    if (!audio) return;
+    try {
+      [0, 0.35, 0.7].forEach(function(off, i){
+        var o = audio.createOscillator(), gn = audio.createGain(), t0 = audio.currentTime + off;
+        o.frequency.value = [784, 659, 988][i]; o.type = 'sine';
+        gn.gain.setValueAtTime(0.0001, t0); gn.gain.exponentialRampToValueAtTime(0.3, t0 + 0.02); gn.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.6);
+        o.connect(gn); gn.connect(audio.destination); o.start(t0); o.stop(t0 + 0.65);
+      });
+    } catch (e) {}
+  }
+  function releaseLock(){ if (lock) { try { lock.release(); } catch (e) {} lock = null; } }
+  function finish(){ tm.running = false; clearInterval(tm.iv); releaseLock(); chime(); }
+  function start(){
+    try { if (!audio) audio = new (window.AudioContext || window.webkitAudioContext)(); if (audio.state === 'suspended') audio.resume(); } catch (e) { audio = null; }
+    if (tm.left === 0) tm.left = tm.total;
+    tm.endAt = Date.now() + tm.left * 1000; tm.running = true;
+    clearInterval(tm.iv); tm.iv = setInterval(tick, 250);
+    if (navigator.wakeLock) navigator.wakeLock.request('screen').then(function(l){ lock = l; }).catch(function(){});
+    render();
+  }
+  function pause(){ tm.left = Math.max(0, Math.ceil((tm.endAt - Date.now()) / 1000)); tm.running = false; clearInterval(tm.iv); releaseLock(); render(); }
+  $('tStart').addEventListener('click', function(){ tm.running ? pause() : start(); });
+  $('tReset').addEventListener('click', function(){ if (tm.running) pause(); tm.left = tm.total; render(); });
+  $('tAdd').addEventListener('click', function(){
+    if (tm.left === 0 && !tm.running) { tm.left = 60; render(); return; }
+    tm.left += 60; if (tm.running) tm.endAt += 60000; render();
+  });
+  document.querySelectorAll('#tPresets [data-min]').forEach(function(b){
+    b.addEventListener('click', function(){
+      if (tm.running) pause();
+      tm.total = tm.left = (+b.dataset.min) * 60;
+      $('tName').textContent = b.dataset.name;
+      document.querySelectorAll('#tPresets [data-min]').forEach(function(o){ o.setAttribute('aria-pressed', o === b ? 'true' : 'false'); });
+      render();
+    });
+  });
+  if (document.fullscreenEnabled) {
+    var fb = $('tFull'); fb.hidden = false;
+    fb.addEventListener('click', function(){
+      if (document.fullscreenElement) { document.exitFullscreen().catch(function(){}); }
+      else { var el = $('view-timer'); if (el.requestFullscreen) el.requestFullscreen().catch(function(){}); }
+    });
+    document.addEventListener('fullscreenchange', function(){ fb.textContent = document.fullscreenElement ? '離開全螢幕' : '全螢幕'; });
+  }
+  document.addEventListener('visibilitychange', function(){
+    if (!document.hidden && tm.running && navigator.wakeLock && !lock) navigator.wakeLock.request('screen').then(function(l){ lock = l; }).catch(function(){});
+  });
+
+  /* ---------- boot ---------- */
+  render();
+  show((location.hash || '').slice(1) || 'sim', false);
+  requestAnimationFrame(frame);
+})();
+</script>
+
+</html>
