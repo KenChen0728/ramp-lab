@@ -910,6 +910,22 @@ body.fs-on{overflow:hidden}
   function fsOpen(on){ fsctl.classList.toggle('open', on); fstog.setAttribute('aria-expanded', String(on)); fstog.textContent = on ? '✓ 收起' : '⚙ 調整'; clearTimeout(fsHide); if (on) fsHide = setTimeout(function(){ fsOpen(false); }, 5000); }
   fstog.addEventListener('click', function(e){ e.stopPropagation(); fsOpen(!fsctl.classList.contains('open')); });
   fsctl.addEventListener('click', function(){ fsOpen(true); });
+  /* ---------- offline: file:// and in-app browsers without service worker simply skip this ---------- */
+  var off = { ok:0, total:0 };
+  function showOffline(){ if (!$('diag').hidden) $('diag').textContent = diagText(); }
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.addEventListener('message', function(e){
+        if (e.data && e.data.type === 'ramp-offline') { off = e.data; showOffline(); }
+      });
+      navigator.serviceWorker.register('sw.js', { updateViaCache:'none' }).then(function(){ return navigator.serviceWorker.ready; }).then(function(reg){
+        function fill(){ if (reg.active) reg.active.postMessage('ramp-fill'); }
+        setTimeout(fill, 1500);
+        window.addEventListener('online', fill);
+      }).catch(function(){});
+    });
+  }
+
   /* ---------- version + device info ---------- */
   function diagText(){
     var p = document.createElement('div');
@@ -922,6 +938,7 @@ body.fs-on{overflow:hidden}
       '方向 ' + (innerWidth > innerHeight ? '橫向' : '直向') + '　開啟方式 ' + (mm('(display-mode: standalone)') || navigator.standalone ? '主畫面 App' : '瀏覽器') + '　全螢幕 ' + (fsEl ? (fsEl.classList.contains('rot') ? '開（轉 90°）' : '開') : '關'),
       '安全區 上 ' + sa[0] + '　右 ' + sa[1] + '　下 ' + sa[2] + '　左 ' + sa[3],
       '外觀 ' + (mm('(prefers-color-scheme: dark)') ? '深色' : '淺色') + '　減少動態 ' + (reduce.matches ? '是' : '否') + '　觸控 ' + (mm('(pointer: coarse)') ? '是' : '否'),
+      '離線檔案 ' + (off.total ? off.ok + '／' + off.total : '還沒準備') + '　網路 ' + (navigator.onLine ? '有' : '沒有'),
       '模擬器 ' + st.theta + '°　刻度 ' + st.s + '　' + SURF[st.surface].name + '　板長 ' + st.cm + ' 公分　畫布 ' + Math.round(W) + '×' + Math.round(H),
       '網址 ' + location.href, '瀏覽器 ' + navigator.userAgent].join('\n');
   }
