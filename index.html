@@ -12,13 +12,12 @@
 <meta name="theme-color" content="#0A1020" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="下坡實驗室">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>胡桃鉗下坡實驗室</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,7 +47,7 @@
   --ramp:#7D603F; --ramp-edge:#C9A36B; --wood:#E8CB96; --wood-back:#C9A671; --wood-edge:#5E3C1B;
   --hat:#141C2E; --face:#EFD3B4; --cg:#7DB2E2; --brass-fill:#E2B659;
   --mat-paper:#D9BC8C; --mat-paper-line:#9C7646; --mat-grip:#A3A8B0; --mat-grip-dot:#4E535B;
-  color-scheme:dark;
+  color-scheme:dark; --cs:dark;
 }}
 :root[data-theme="dark"]{
   --bg:#0F1626; --surface:#17213A; --surface-2:#1E2A46; --ink:#F1ECE2; --ink-soft:#AEB6C6; --line:#2B3854; --line-strong:#40507A;
@@ -58,13 +57,37 @@
   --ramp:#7D603F; --ramp-edge:#C9A36B; --wood:#E8CB96; --wood-back:#C9A671; --wood-edge:#5E3C1B;
   --hat:#141C2E; --face:#EFD3B4; --cg:#7DB2E2; --brass-fill:#E2B659;
   --mat-paper:#D9BC8C; --mat-paper-line:#9C7646; --mat-grip:#A3A8B0; --mat-grip-dot:#4E535B;
-  color-scheme:dark;
+  color-scheme:dark; --cs:dark;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;-webkit-tap-highlight-color:transparent}
-/* the strip under a phone's status bar keeps the band color, so the clock stays readable */
-body::before{content:"";position:fixed;inset:0 0 auto;height:var(--sat);z-index:70;background:var(--band);pointer-events:none}
+/* iPhone 上下邊（和排球記錄表同一套，已在 iPhone 實機確認）。主畫面 App 有兩種狀況：
+   一、從狀態列後面開始畫（上 inset 大於 0）：系統會蓋一層關不掉的模糊，內容要多留 40，模糊才只落在色帶上；開機時 100dvh 偏短，要用 100lvh 才到螢幕底。
+   二、從狀態列下方開始（上 inset 是 0）：沒有模糊，這時 100lvh 不準，要用 100dvh。後面的 min() 兩種都對。 */
+:root{--safe-top:env(safe-area-inset-top,0px);--top-gap:var(--safe-top);--vgap:0px;--edge:linear-gradient(var(--gold) 0 1px,var(--coat) 1px 2px,var(--gold) 2px 3px)}
+.statusband{position:fixed;top:0;left:0;right:0;height:var(--safe-top);background:var(--band);z-index:99;pointer-events:none;overflow:hidden}
+.footband{display:none}
+@media print{.statusband,.footband{display:none}}
+html{touch-action:manipulation;overscroll-behavior:none}
+body{overscroll-behavior:none}
+button,label,.band{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+@media (display-mode:standalone){
+  :root{--safe-top:calc(env(safe-area-inset-top,0px) + min(40px,calc(env(safe-area-inset-top,0px)*99)));--top-gap:max(6px,var(--safe-top))}
+  html{background:var(--band);color-scheme:dark}
+  body{color-scheme:var(--cs,light)}
+  .statusband{height:var(--top-gap)}
+  .statusband::after,.footband::before{content:"";position:absolute;left:0;right:0;height:3px;background:var(--edge)}
+  .statusband::after{bottom:0}
+  .footband::before{top:0}
+}
+@media (display-mode:standalone) and (orientation:portrait){
+  .footband{display:block;position:fixed;left:0;right:0;bottom:calc(0px - var(--vgap));height:env(safe-area-inset-bottom,0px);background:var(--band);z-index:99;pointer-events:none;overflow:hidden}
+}
+@media (display-mode:standalone) and (orientation:landscape) and (max-height:500px){
+  :root{--top-gap:var(--safe-top)}
+  .statusband{display:none}
+}
 h1,h2,h3,p{margin:0}
 button,input,label{font:inherit}
 button{cursor:pointer}
@@ -74,7 +97,7 @@ button{cursor:pointer}
 .band{background-color:var(--band);color:var(--on-band);
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='132'%3E%3Cg fill='%23F6F0E4'%3E%3Ccircle cx='14' cy='20' r='1.8' opacity='.35'/%3E%3Ccircle cx='58' cy='74' r='1.2' opacity='.25'/%3E%3Ccircle cx='96' cy='16' r='2.4' opacity='.22'/%3E%3Ccircle cx='131' cy='98' r='1.6' opacity='.3'/%3E%3Ccircle cx='170' cy='44' r='1.1' opacity='.3'/%3E%3Ccircle cx='205' cy='112' r='2' opacity='.2'/%3E%3Ccircle cx='226' cy='30' r='1.4' opacity='.32'/%3E%3Ccircle cx='34' cy='118' r='1.3' opacity='.24'/%3E%3Ccircle cx='80' cy='46' r='1' opacity='.3'/%3E%3Ccircle cx='150' cy='8' r='1.5' opacity='.26'/%3E%3Ccircle cx='188' cy='80' r='2.6' opacity='.14'/%3E%3C/g%3E%3C/svg%3E")}
 .band::after{content:"";display:block;height:8px;background:linear-gradient(var(--gold) 0 2px,var(--coat) 2px 6px,var(--gold) 6px 8px)}
-.band-in{max-width:1440px;margin-inline:auto;padding-left:max(16px,var(--sal));padding-right:max(16px,var(--sar));padding-block:18px 16px;
+.band-in{max-width:1440px;margin-inline:auto;padding-left:max(16px,var(--sal));padding-right:max(16px,var(--sar));padding-block:calc(var(--top-gap) + 18px) 16px;
   display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 28px}
 .brand{display:flex;flex-direction:column;gap:2px;min-width:0}
 .eyebrow{font-size:13px;font-weight:700;letter-spacing:.14em;color:var(--gold)}
@@ -86,7 +109,7 @@ h1{font-family:var(--display);font-size:clamp(28px,3.4vw,42px);line-height:1.15;
 .tab:hover:not([aria-selected="true"]){color:var(--on-band)}
 .tab:focus-visible{outline-color:var(--gold)}
 
-.wrap{max-width:1440px;margin-inline:auto;padding-left:max(16px,var(--sal));padding-right:max(16px,var(--sar));padding-block:20px 40px;display:flex;flex-direction:column;gap:20px}
+.wrap{max-width:1440px;margin-inline:auto;padding-left:max(16px,var(--sal));padding-right:max(16px,var(--sar));padding-block:20px calc(40px + var(--sab));display:flex;flex-direction:column;gap:20px}
 
 /* simulator */
 .sim{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:20px;align-items:start}
@@ -184,13 +207,13 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;bac
 .stage .fsbtn{bottom:auto;top:10px}
 .fsbtn .i-close{display:none}
 .is-fs .fsbtn .i-open{display:none}.is-fs .fsbtn .i-close{display:inline}
-body.fs-on{overflow:hidden}
+body.fs-on,body.fs-on #app{overflow:hidden}
 /* .stage.is-fs (two classes) so the pinned-stage rules below cannot move the full-screen layer */
-.stage.is-fs,.vbox.is-fs{--it:var(--sat);--ir:var(--sar);--ib:var(--sab);--il:var(--sal);
+.stage.is-fs,.vbox.is-fs{--it:var(--top-gap);--ir:var(--sar);--ib:var(--sab);--il:var(--sal);
   position:fixed!important;z-index:60;inset:0;width:100vw;height:100vh;height:100dvh;margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;
   background:var(--scene-sky);display:flex;align-items:center;justify-content:center;padding:var(--it) var(--ir) var(--ib) var(--il)}
 .vbox.is-fs{background:var(--video-bg)}
-.stage.is-fs.rot,.vbox.is-fs.rot{--it:var(--sar);--ir:var(--sab);--ib:var(--sal);--il:var(--sat);inset:auto;top:0;left:0;width:100vh;width:100dvh;height:100vw;transform-origin:top left;transform:translateX(100vw) rotate(90deg)}
+.stage.is-fs.rot,.vbox.is-fs.rot{--it:var(--sar);--ir:var(--sab);--ib:var(--sal);--il:var(--top-gap);inset:auto;top:0;left:0;width:100vh;width:100dvh;height:100vw;transform-origin:top left;transform:translateX(100vw) rotate(90deg)}
 .is-fs #scene{width:100%;height:100%;aspect-ratio:auto;max-height:none}
 .is-fs .stage-foot{display:none}
 .is-fs video{width:100%!important;height:100%!important;max-height:none;object-fit:contain;border:0!important;border-radius:0!important;aspect-ratio:auto!important}
@@ -212,11 +235,11 @@ body.fs-on{overflow:hidden}
 /* tablets and phones held upright: one column, stage pinned to the top */
 @media (max-width:900px){
   .sim{grid-template-columns:1fr}
-  .stage{position:sticky;top:var(--sat);z-index:5;box-shadow:0 8px 18px var(--shadow)}
+  .stage{position:sticky;top:var(--top-gap);z-index:5;box-shadow:0 8px 18px var(--shadow)}
   .stage-foot{display:none}
   #scene{max-height:none}
   .panel .card{gap:16px;padding:16px}
-  .band-in{padding-block:14px 12px}
+  .band-in{padding-block:calc(var(--top-gap) + 14px) 12px}
 }
 @media (max-width:820px){
   .secret{flex-direction:column;gap:16px;padding:14px}
@@ -231,24 +254,40 @@ body.fs-on{overflow:hidden}
   .tabs{width:100%}
   .tab{flex:1;padding:0 8px}
   .lede{font-size:14px}
-  .wrap{padding-block:14px 32px;gap:16px}
+  .wrap{padding-block:14px calc(32px + var(--sab));gap:16px}
 }
 /* phone turned sideways (not full screen): slim band, stage on the left fits the screen and stays put while the controls scroll */
 @media (orientation:landscape) and (max-height:500px){
-  .band-in{padding-block:6px;align-items:center;flex-wrap:nowrap}
+  .band-in{padding-block:calc(var(--top-gap) + 6px) 6px;align-items:center;flex-wrap:nowrap}
   .eyebrow,.lede{display:none}
   h1{font-size:21px;white-space:nowrap}
   .tabs{width:auto}
   .tab{min-height:40px;padding:0 14px;font-size:15px;flex:none}
-  .wrap{padding-block:10px 24px;gap:12px}
+  .wrap{padding-block:10px calc(24px + var(--sab));gap:12px}
   .sim{grid-template-columns:minmax(0,1fr) 290px;gap:12px}
-  .stage{position:sticky;top:calc(var(--sat) + 8px);z-index:5;box-shadow:none}
-  #scene{aspect-ratio:auto;height:calc(100dvh - var(--sat) - var(--sab) - 84px);min-height:190px;max-height:none}
+  .stage{position:sticky;top:calc(var(--top-gap) + 8px);z-index:5;box-shadow:none}
+  #scene{aspect-ratio:auto;height:calc(100dvh - var(--top-gap) - var(--sab) - 84px);min-height:190px;max-height:none}
   .stage-foot{display:none}
   .panel .card{gap:12px;padding:14px}
 }
+/* 主畫面 App 高度：整個畫面由 #app 捲動，固定面板補上 100dvh 和實際高度的差 */
+@supports (height:100lvh){
+  @media (display-mode:standalone){
+    :root{--app-h:min(100lvh,calc(100dvh + env(safe-area-inset-top,0px)*99));--vgap:calc(var(--app-h) - 100dvh)}
+    html,body,#app{height:var(--app-h)}
+    html,body{overflow:visible}
+    #app{overflow:hidden auto;-webkit-overflow-scrolling:touch}
+    body.fs-on{overflow:visible}
+    .stage.is-fs,.vbox.is-fs{height:var(--app-h)}
+  }
+  @media (display-mode:standalone) and (orientation:portrait){
+    .stage.is-fs.rot,.vbox.is-fs.rot{width:var(--app-h);height:100vw}
+  }
+}
 </style>
 
+<div class="statusband" aria-hidden="true"></div><div class="footband" aria-hidden="true"></div>
+<div id="app">
 <header class="band">
   <div class="band-in">
     <div class="brand">
@@ -413,12 +452,15 @@ body.fs-on{overflow:hidden}
       <pre id="diag" hidden></pre>
     </footer>
 </main>
+</div>
 
 <script>
 (function(){
   var $ = function(id){ return document.getElementById(id); };
   var VERSION = '2026.11.05-1';
   var reduce = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : {matches:false};
+
+  function toTop(){ window.scrollTo(0, 0); $('app').scrollTop = 0; }
 
   /* ---------- tabs ---------- */
   var VIEWS = ['sim','secrets','home'];
@@ -429,6 +471,7 @@ body.fs-on{overflow:hidden}
     document.querySelectorAll('[data-view]').forEach(function(s){ s.hidden = s.dataset.view !== v; });
     tabs.forEach(function(b){ var on = b.dataset.target === v; b.setAttribute('aria-selected', on ? 'true' : 'false'); b.tabIndex = on ? 0 : -1; });
     if (write) { try { history.replaceState(null, '', '#' + v); } catch (e) {} }
+    toTop();
     if (v === 'sim') { sizeCanvas(); restart(); }
     syncVideos();
   }
@@ -811,7 +854,7 @@ body.fs-on{overflow:hidden}
     if (convDeg === null) return;
     st.cm = Math.round(parseFloat($('rampLen').value) * 10) / 10;
     document.querySelectorAll('input[name=len]').forEach(function(r){ r.checked = false; });
-    var s = $('slope'); s.value = Math.min(30, Math.round(convDeg)); s.dispatchEvent(new Event('input')); show('sim', true); window.scrollTo(0,0);
+    var s = $('slope'); s.value = Math.min(30, Math.round(convDeg)); s.dispatchEvent(new Event('input')); show('sim', true);
   });
   convert();
 
