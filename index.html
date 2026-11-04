@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<html lang="zh-Hant" data-page="start"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="調坡度、移士兵，看木馬能不能走下坡！國圖冬季講堂・胡桃鉗大戰老鼠王">
 <meta property="og:type" content="website">
 <meta property="og:title" content="胡桃鉗下坡實驗室">
@@ -19,6 +19,7 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>胡桃鉗下坡實驗室</title>
+<script>if(location.hash.length>1)document.documentElement.setAttribute("data-page","tab")</script>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -99,7 +100,7 @@ button{cursor:pointer}
 .band::after{content:"";display:block;height:8px;background:linear-gradient(var(--gold) 0 2px,var(--coat) 2px 6px,var(--gold) 6px 8px)}
 .band-in{max-width:1440px;margin-inline:auto;padding-left:max(16px,var(--sal));padding-right:max(16px,var(--sar));padding-block:calc(var(--top-gap) + 18px) 16px;
   display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 28px}
-.brand{display:flex;flex-direction:column;gap:2px;min-width:0}
+.brand{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 auto}
 .eyebrow{font-size:13px;font-weight:700;letter-spacing:.14em;color:var(--gold)}
 h1{font-family:var(--display);font-size:clamp(28px,3.4vw,42px);line-height:1.15;font-weight:700;text-wrap:balance;color:var(--on-band)}
 .lede{font-size:15px;color:var(--on-band-soft);margin-top:4px;text-wrap:balance}
@@ -110,6 +111,19 @@ h1{font-family:var(--display);font-size:clamp(28px,3.4vw,42px);line-height:1.15;
 .tab:focus-visible{outline-color:var(--gold)}
 
 .wrap{max-width:1440px;margin-inline:auto;padding-left:max(16px,var(--sal));padding-right:max(16px,var(--sar));padding-block:20px calc(40px + var(--sab));display:flex;flex-direction:column;gap:20px}
+
+.band-tools{display:flex;gap:8px;flex:none;align-self:center}
+.iconbtn{width:48px;height:48px;border-radius:50%;border:1px solid rgba(255,255,255,.34);background:rgba(255,255,255,.08);color:var(--on-band);font-size:25px;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;padding:0}
+.iconbtn:hover{background:rgba(255,255,255,.18)}
+.iconbtn:focus-visible{outline-color:var(--gold)}
+html[data-page="start"] .tabs,html[data-page="start"] .band-tools,html[data-page="start"] [data-view]:not(#view-start),html[data-page="tab"] #view-start{display:none}
+
+/* start page */
+.start{display:flex;flex-direction:column;align-items:center;gap:24px;padding-block:4px 8px}
+.start-art{display:block;width:min(64vw,280px);height:auto;border-radius:32px;box-shadow:0 10px 26px var(--shadow)}
+.start-main{width:100%;max-width:420px;display:flex;flex-direction:column;gap:12px}
+.btn.start-go{min-height:76px;font-size:26px;border-radius:18px}
+.start-note{font-size:15px;line-height:1.5;color:var(--ink-soft);text-align:center}
 
 /* simulator */
 .sim{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:20px;align-items:start}
@@ -240,6 +254,10 @@ body.fs-on,body.fs-on #app{overflow:hidden}
   #scene{max-height:none}
   .panel .card{gap:16px;padding:16px}
   .band-in{padding-block:calc(var(--top-gap) + 14px) 12px}
+  .brand{flex:1 1 0}
+  .band-tools{order:1}
+  .tabs{order:2;width:100%}
+  .tab{flex:1;padding:0 8px}
 }
 @media (max-width:820px){
   .secret{flex-direction:column;gap:16px;padding:14px}
@@ -251,18 +269,24 @@ body.fs-on,body.fs-on #app{overflow:hidden}
   .home{grid-template-columns:1fr}
 }
 @media (max-width:600px){
-  .tabs{width:100%}
-  .tab{flex:1;padding:0 8px}
-  .lede{font-size:14px}
+  .band-in{gap:10px 12px}
+  .eyebrow{letter-spacing:.06em}
+  h1{font-size:clamp(21px,7vw,28px)}
+  html[data-page="tab"] .lede{display:none}
   .wrap{padding-block:14px calc(32px + var(--sab));gap:16px}
 }
 /* phone turned sideways (not full screen): slim band, stage on the left fits the screen and stays put while the controls scroll */
 @media (orientation:landscape) and (max-height:500px){
-  .band-in{padding-block:calc(var(--top-gap) + 6px) 6px;align-items:center;flex-wrap:nowrap}
+  .band-in{padding-block:calc(var(--top-gap) + 6px) 6px;align-items:center;flex-wrap:nowrap;gap:12px}
+  .brand{flex:0 1 auto}
   .eyebrow,.lede{display:none}
   h1{font-size:21px;white-space:nowrap}
-  .tabs{width:auto}
+  .tabs{order:0;width:auto;margin-left:auto}
   .tab{min-height:40px;padding:0 14px;font-size:15px;flex:none}
+  .iconbtn{width:44px;height:44px;font-size:22px}
+  .start{flex-direction:row;justify-content:center;gap:32px}
+  .start-art{width:min(46vh,190px)}
+  .btn.start-go{min-height:64px;font-size:22px}
   .wrap{padding-block:10px calc(24px + var(--sab));gap:12px}
   .sim{grid-template-columns:minmax(0,1fr) 290px;gap:12px}
   .stage{position:sticky;top:calc(var(--top-gap) + 8px);z-index:5;box-shadow:none}
@@ -300,11 +324,25 @@ body.fs-on,body.fs-on #app{overflow:hidden}
       <button class="tab" role="tab" id="tab-secrets" data-target="secrets" aria-controls="view-secrets" aria-selected="false" type="button">三個秘密</button>
       <button class="tab" role="tab" id="tab-home" data-target="home" aria-controls="view-home" aria-selected="false" type="button">在家玩</button>
     </nav>
+    <div class="band-tools">
+      <button type="button" class="iconbtn" id="homeBtn" aria-label="回到首頁"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11.5 12 4l8.5 7.5"/><path d="M6 9.8V20h12V9.8"/></svg></button>
+      <button type="button" class="iconbtn" id="helpBtn" aria-label="看這一頁怎麼用">?</button>
+    </div>
   </div>
 </header>
 
 <main class="wrap">
-    <section id="view-sim" data-view="sim" role="tabpanel" aria-labelledby="tab-sim">
+    <section id="view-start" class="start" data-view="start" aria-label="首頁">
+      <img class="start-art" src="icons/icon-512.png" width="512" height="512" alt="月亮前面，胡桃鉗士兵騎著木馬走下坡">
+      <div class="start-main">
+        <button class="btn start-go" id="startBtn" type="button">開始玩</button>
+        <button class="btn ghost" id="startHelp" type="button">看使用說明</button>
+        <p class="start-note" id="offlineNote" hidden></p>
+        <p class="start-note" id="inappNote" hidden>你是在 LINE 或 Facebook 裡打開的。影片不順或想加到主畫面時，請按右上角選單，改用 Safari 或 Chrome 開啟。</p>
+      </div>
+    </section>
+
+    <section id="view-sim" data-view="sim" role="tabpanel" aria-labelledby="tab-sim" hidden>
       <div class="sim">
         <div class="stage">
           <canvas id="scene" role="img" aria-label="士兵騎馬下坡的動畫"></canvas>
@@ -460,14 +498,17 @@ body.fs-on,body.fs-on #app{overflow:hidden}
   var VERSION = '2026.11.05-1';
   var reduce = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : {matches:false};
 
+  var curView = 'start';
   function toTop(){ window.scrollTo(0, 0); $('app').scrollTop = 0; }
 
   /* ---------- tabs ---------- */
-  var VIEWS = ['sim','secrets','home'];
+  var VIEWS = ['start','sim','secrets','home'];
   var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
   function show(v, write){
     if (VIEWS.indexOf(v) < 0) v = 'sim';
     if (typeof fsEl !== 'undefined' && fsEl) fsToggle(fsEl);
+    curView = v;
+    document.documentElement.setAttribute('data-page', v === 'start' ? 'start' : 'tab');
     document.querySelectorAll('[data-view]').forEach(function(s){ s.hidden = s.dataset.view !== v; });
     tabs.forEach(function(b){ var on = b.dataset.target === v; b.setAttribute('aria-selected', on ? 'true' : 'false'); b.tabIndex = on ? 0 : -1; });
     if (write) { try { history.replaceState(null, '', '#' + v); } catch (e) {} }
@@ -475,7 +516,7 @@ body.fs-on,body.fs-on #app{overflow:hidden}
     if (v === 'sim') { sizeCanvas(); restart(); }
     syncVideos();
   }
-  window.addEventListener('hashchange', function(){ show((location.hash || '').slice(1) || 'sim', false); });
+  window.addEventListener('hashchange', function(){ show((location.hash || '').slice(1) || 'start', false); });
   tabs.forEach(function(b, i){
     b.addEventListener('click', function(){ show(b.dataset.target, true); });
     b.addEventListener('keydown', function(e){
@@ -484,6 +525,14 @@ body.fs-on,body.fs-on #app{overflow:hidden}
       n.focus(); show(n.dataset.target, true);
     });
   });
+
+  /* ---------- start page ---------- */
+  $('startBtn').addEventListener('click', function(){ location.hash = 'sim'; });
+  $('homeBtn').addEventListener('click', function(){
+    try { history.pushState(null, '', location.pathname + location.search); show('start', false); }
+    catch (e) { location.hash = ''; }
+  });
+  if (/\bLine\/|FBAN|FBAV|FB_IAB|Instagram/i.test(navigator.userAgent)) $('inappNote').hidden = false;
 
   /* ---------- simulator ---------- */
   var cv = $('scene'), ctx = cv.getContext('2d');
@@ -955,7 +1004,10 @@ body.fs-on,body.fs-on #app{overflow:hidden}
   fsctl.addEventListener('click', function(){ fsOpen(true); });
   /* ---------- offline: file:// and in-app browsers without service worker simply skip this ---------- */
   var off = { ok:0, total:0 };
-  function showOffline(){ if (!$('diag').hidden) $('diag').textContent = diagText(); }
+  function showOffline(){
+    if (!$('diag').hidden) $('diag').textContent = diagText();
+    var n = $('offlineNote'); n.hidden = !(off.total && off.ok === off.total); n.textContent = '這台裝置已經存好了，沒有網路也能用。';
+  }
   if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
     window.addEventListener('load', function(){
       navigator.serviceWorker.addEventListener('message', function(e){
@@ -988,7 +1040,7 @@ body.fs-on,body.fs-on #app{overflow:hidden}
   $('verBtn').addEventListener('click', function(){ var d = $('diag'), open = d.hidden; d.hidden = !open; this.setAttribute('aria-expanded', String(open)); if (open) d.textContent = diagText(); });
   window.addEventListener('resize', function(){ if (!$('diag').hidden) $('diag').textContent = diagText(); });
   /* ---------- boot ---------- */
-  show((location.hash || '').slice(1) || 'sim', false);
+  show((location.hash || '').slice(1) || 'start', false);
   requestAnimationFrame(frame);
 })();
 </script>
