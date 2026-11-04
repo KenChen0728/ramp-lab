@@ -32,7 +32,7 @@
   --band:#1E2A44; --on-band:#F6F0E4; --on-band-soft:#C9CEDB; --video-bg:#FBF8F2; --shadow:rgba(15,22,38,.22);
   --scene-sky:#FFFDF8; --scene-hill:#EEE7DA; --scene-ground:#DED3BF; --scene-ink:#1E2A44; --scene-snow:#CDD6E3; --scene-tree:#E2D9C8;
   --ramp:#E8D9BC; --ramp-edge:#A88B60; --wood:#EDD4A7; --wood-back:#D9BC8C; --wood-edge:#7E5228;
-  --hat:#22304F; --face:#F3D9BC; --cg:#2E6DA4; --brass-fill:#E2B659;
+  --hat:#22304F; --face:#F3D9BC; --cg:#1C5FB0; --cg-halo:#FFFFFF; --cg-on:#FFFFFF; --brass-fill:#E2B659;
   --mat-ice:#BEE0F3; --mat-shine:#F4FBFF; --mat-paper:#E6CB9C; --mat-paper-line:#B48A55;
   --mat-felt:#97A3B2; --mat-fleck:#6D7888; --mat-grip:#9EA3AB; --mat-grip-dot:#5E636B;
   --display:"LXGW WenKai TC","Noto Sans TC","PingFang TC","Microsoft JhengHei",serif;
@@ -47,7 +47,7 @@
   --band:#0A1020; --on-band:#F1ECE2; --on-band-soft:#AEB6C6; --video-bg:#FBF8F2; --shadow:rgba(0,0,0,.45);
   --scene-sky:#17223C; --scene-hill:#1F2D4B; --scene-ground:#2A3858; --scene-ink:#F1ECE2; --scene-snow:#DCE4F2; --scene-tree:#24334F;
   --ramp:#7D603F; --ramp-edge:#C9A36B; --wood:#E8CB96; --wood-back:#C9A671; --wood-edge:#5E3C1B;
-  --hat:#141C2E; --face:#EFD3B4; --cg:#7DB2E2; --brass-fill:#E2B659;
+  --hat:#141C2E; --face:#EFD3B4; --cg:#62B4FF; --cg-halo:#0A1020; --cg-on:#0A1020; --brass-fill:#E2B659;
   --mat-paper:#D9BC8C; --mat-paper-line:#9C7646; --mat-grip:#A3A8B0; --mat-grip-dot:#4E535B;
   --good:#71C694; --good-bg:#16301F; --warn:#E8B95C; --warn-bg:#382B11; --bad:#F08B80; --bad-bg:#3A1C19; --slide:#83B6E4; --slide-bg:#15283B;
   color-scheme:dark; --cs:dark;
@@ -58,7 +58,7 @@
   --band:#0A1020; --on-band:#F1ECE2; --on-band-soft:#AEB6C6; --video-bg:#FBF8F2; --shadow:rgba(0,0,0,.45);
   --scene-sky:#17223C; --scene-hill:#1F2D4B; --scene-ground:#2A3858; --scene-ink:#F1ECE2; --scene-snow:#DCE4F2; --scene-tree:#24334F;
   --ramp:#7D603F; --ramp-edge:#C9A36B; --wood:#E8CB96; --wood-back:#C9A671; --wood-edge:#5E3C1B;
-  --hat:#141C2E; --face:#EFD3B4; --cg:#7DB2E2; --brass-fill:#E2B659;
+  --hat:#141C2E; --face:#EFD3B4; --cg:#62B4FF; --cg-halo:#0A1020; --cg-on:#0A1020; --brass-fill:#E2B659;
   --mat-paper:#D9BC8C; --mat-paper-line:#9C7646; --mat-grip:#A3A8B0; --mat-grip-dot:#4E535B;
   --good:#71C694; --good-bg:#16301F; --warn:#E8B95C; --warn-bg:#382B11; --bad:#F08B80; --bad-bg:#3A1C19; --slide:#83B6E4; --slide-bg:#15283B;
   color-scheme:dark; --cs:dark;
@@ -140,6 +140,8 @@ html[data-page="start"] .tabs,html[data-page="start"] .band-tools,html[data-page
 .result .verdict{font-family:var(--display);font-size:22px;font-weight:700;line-height:1.3;color:var(--rc)}
 .result .why,.result .try{font-size:16px;line-height:1.45}
 .result .try{font-weight:700}
+.result{transition:opacity .2s ease}
+.result.dim{opacity:.1;pointer-events:none}
 .result[data-kind="walk"]{--rc:var(--good);--rb:var(--good-bg)}
 .result[data-kind="stutter"]{--rc:var(--warn);--rb:var(--warn-bg)}
 .result[data-kind="slide"]{--rc:var(--slide);--rb:var(--slide-bg)}
@@ -147,8 +149,8 @@ html[data-page="start"] .tabs,html[data-page="start"] .band-tools,html[data-page
 @media (max-width:600px) and (min-height:701px){.result{min-height:134px}}
 @media (min-width:901px){.result{position:absolute;z-index:4;top:10px;right:72px;width:min(46%,430px);min-height:0;padding:10px 14px;border:1px solid var(--line);border-left:6px solid var(--rc);border-radius:12px;box-shadow:0 4px 12px var(--shadow)}}
 @media (max-height:700px){.result .why{display:none}}
-.k-cg{width:12px;height:12px;border-radius:50%;background:var(--cg)}
-.k-g{width:22px;border-top:2px dashed var(--cg)}
+.k-cg{width:14px;height:14px;border-radius:50%;background:var(--cg)}
+.k-g{width:30px;border-top:4px dashed var(--cg)}
 .k-pv{width:14px;height:14px;border-radius:50%;border:2px dashed var(--coat)}
 .stage-note{flex-basis:100%;font-size:14px}
 .panel{display:flex;flex-direction:column;gap:16px;min-width:0}
@@ -542,7 +544,7 @@ body.fs-on,body.fs-on #app{overflow:hidden}
     </section>
     <footer class="foot">
       <p>國立屏東科技大學　陳則翰、許衷源、鄭博元 老師<br>2026 國家圖書館冬季講堂・胡桃鉗大戰老鼠王：逐步下坡玩具科學體驗</p>
-      <button type="button" class="ver" id="verBtn" aria-expanded="false" aria-controls="diag">版本 2026.11.05-2</button>
+      <button type="button" class="ver" id="verBtn" aria-expanded="false" aria-controls="diag">版本 2026.11.05-3</button>
       <pre id="diag" hidden></pre>
     </footer>
 </main>
@@ -570,7 +572,7 @@ body.fs-on,body.fs-on #app{overflow:hidden}
 <script>
 (function(){
   var $ = function(id){ return document.getElementById(id); };
-  var VERSION = '2026.11.05-2';
+  var VERSION = '2026.11.05-3';
   var reduce = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : {matches:false};
 
   var curView = 'start';
@@ -752,7 +754,7 @@ body.fs-on,body.fs-on #app{overflow:hidden}
     function v(n){ return cs.getPropertyValue(n).trim(); }
     return { paper:v('--scene-sky'), snow:v('--scene-hill'), line:v('--scene-ground'), ink:v('--scene-ink'), soft:v('--ink-soft'), flake:v('--scene-snow'), tree:v('--scene-tree'),
       ramp:v('--ramp'), rampEdge:v('--ramp-edge'), wood:v('--wood'), woodBack:v('--wood-back'), woodEdge:v('--wood-edge'),
-      hat:v('--hat'), face:v('--face'), coat:v('--coat'), brass:v('--brass-fill'), cg:v('--cg'),
+      hat:v('--hat'), face:v('--face'), coat:v('--coat'), brass:v('--brass-fill'), cg:v('--cg'), cgHalo:v('--cg-halo'), cgOn:v('--cg-on'), onCoat:v('--on-coat'),
       mat:{ ice:v('--mat-ice'), paper:v('--mat-paper'), felt:v('--mat-felt'), grip:v('--mat-grip') },
       shine:v('--mat-shine'), paperLine:v('--mat-paper-line'), fleck:v('--mat-fleck'), gripDot:v('--mat-grip-dot') };
   }
@@ -764,6 +766,16 @@ body.fs-on,body.fs-on #app{overflow:hidden}
     ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
   }
   function line(x1, y1, x2, y2){ ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); }
+  // a filled label (重心 / 支點) that stays readable on wood, sky or snow
+  function pill(t, x, y, align, fill, color, ring, size){
+    ctx.save(); ctx.font = '900 ' + size + 'px "Noto Sans TC",sans-serif';
+    var w = ctx.measureText(t).width + size * 0.9, h = size * 1.5;
+    var x0 = align === 'right' ? x - w : (align === 'center' ? x - w / 2 : x);
+    x0 = Math.max(4, Math.min(W - w - 4, x0)); var y0 = Math.max(4, Math.min(H - h - 4, y - h / 2));
+    rr(x0, y0, w, h, h / 2); ctx.fillStyle = fill; ctx.fill(); ctx.lineWidth = Math.max(2, size * 0.13); ctx.strokeStyle = ring; ctx.stroke();
+    ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(t, x0 + w / 2, y0 + h / 2 + size * 0.04);
+    ctx.restore();
+  }
   function haloText(t, x, y, fill, halo, w){ ctx.save(); ctx.lineJoin = 'round'; ctx.strokeStyle = halo; ctx.lineWidth = w; ctx.strokeText(t, x, y); ctx.fillStyle = fill; ctx.fillText(t, x, y); ctx.restore(); }
   function limb(x1, y1, x2, y2, fill, P){
     ctx.strokeStyle = P.woodEdge; ctx.lineWidth = 16; line(x1, y1, x2, y2);
@@ -930,24 +942,40 @@ body.fs-on,body.fs-on #app{overflow:hidden}
     ctx.font = '700 ' + fs + 'px "Noto Sans TC",sans-serif';
     if (ps.pivot !== 'none') {
       var pw = toWorld(pv, ps, g);
-      ctx.strokeStyle = P.coat; ctx.lineWidth = Math.max(1.5, 2.2 * k); ctx.setLineDash([4, 3]);
-      ctx.beginPath(); ctx.arc(pw.x, pw.y, Math.max(8, 14 * k), 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
-      var ringR = Math.max(8, 14 * k), below = pw.y + ringR + 4 + fs < g.baseY - 2;
-      ctx.textAlign = below ? 'center' : 'right'; ctx.textBaseline = below ? 'top' : 'middle';
-      haloText('支點', below ? pw.x : pw.x - ringR - 6, below ? pw.y + ringR + 4 : pw.y, P.coat, P.paper, Math.max(3, 4 * k));
+      var ringR = Math.max(9, 15 * k), lf = Math.max(15, 21 * k), ph = lf * 1.5;
+      ctx.strokeStyle = P.coat; ctx.lineWidth = Math.max(2.2, 3 * k); ctx.setLineDash([Math.max(4, 6 * k), Math.max(3, 4 * k)]);
+      ctx.beginPath(); ctx.arc(pw.x, pw.y, ringR, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+      if (pw.y + ringR + 6 + ph < g.baseY - 2) pill('支點', pw.x, pw.y + ringR + 6 + ph / 2, 'center', P.coat, P.onCoat, P.paper, lf);
+      else pill('支點', pw.x - ringR - 8, pw.y, 'right', P.coat, P.onCoat, P.paper, lf);
     }
     if (st.cg) {
       var ru = riderU(st.p);
       var cgL = { x:(2 * -35 + 1.2 * ru) / 3.2, y:(2 * -104 + 1.2 * -165) / 3.2 };
       var cw = toWorld(cgL, ps, g), ys;
       if (cw.x >= g.A.x && cw.x <= g.B.x) ys = g.A.y + (cw.x - g.A.x) * Math.tan(g.th); else ys = g.baseY;
-      ctx.strokeStyle = P.cg; ctx.lineWidth = Math.max(1.5, 2 * k); ctx.setLineDash([6, 5]);
-      line(cw.x, cw.y, cw.x, ys); ctx.setLineDash([]);
-      ctx.fillStyle = P.cg; ctx.strokeStyle = P.paper; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.arc(cw.x, cw.y, Math.max(5, 8 * k), 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-      ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-      haloText('重心', cw.x - Math.max(9, 14 * k), cw.y, P.cg, P.paper, Math.max(3, 4 * k));
+      var lw = Math.max(3, 4.2 * k), ah = Math.max(10, 15 * k), dr = Math.max(6, 10 * k), cf = Math.max(15, 21 * k);
+      var arrow = ys - cw.y > ah * 1.6, yEnd = arrow ? ys - ah * 0.7 : ys;
+      ctx.save(); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.strokeStyle = P.cgHalo; ctx.lineWidth = lw + Math.max(3, 4 * k); line(cw.x, cw.y, cw.x, yEnd);
+      ctx.strokeStyle = P.cg; ctx.lineWidth = lw; ctx.setLineDash([Math.max(8, 13 * k), Math.max(6, 9 * k)]); line(cw.x, cw.y, cw.x, yEnd); ctx.setLineDash([]);
+      if (arrow) { ctx.beginPath(); ctx.moveTo(cw.x, ys); ctx.lineTo(cw.x - ah * 0.62, ys - ah); ctx.lineTo(cw.x + ah * 0.62, ys - ah); ctx.closePath();
+        ctx.strokeStyle = P.cgHalo; ctx.lineWidth = Math.max(2.5, 3.5 * k); ctx.stroke(); ctx.fillStyle = P.cg; ctx.fill(); }
+      ctx.fillStyle = P.cg; ctx.strokeStyle = P.cgHalo; ctx.lineWidth = Math.max(2.5, 3.5 * k);
+      ctx.beginPath(); ctx.arc(cw.x, cw.y, dr, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.restore();
+      pill('重心', cw.x - dr - 8, cw.y, 'right', P.cg, P.cgOn, P.cgHalo, cf);
     }
+    avoidCard(ps, g);
+  }
+  function avoidCard(ps, g){
+    var rc = $('result');
+    if (!rc || getComputedStyle(rc).position !== 'absolute') { if (rc) rc.classList.remove('dim'); return; }
+    // outline points of horse + soldier (hat, head, ears, muzzle, chest, tail, back, feet)
+    var ru = riderU(st.p);
+    var pts = [[ru, -246], [ru - 14, -192], [ru + 14, -192], [46, -218], [104, -178], [114, -150], [64, -118], [-154, -110], [-154, -68], [-114, -134], [0, 4], [-84, 4]].map(function(q){ return toWorld({ x:q[0], y:q[1] }, ps, g); });
+    var xs = pts.map(function(q){ return q.x; }), ys2 = pts.map(function(q){ return q.y; });
+    var x1 = Math.min.apply(null, xs), x2 = Math.max.apply(null, xs), y1 = Math.min.apply(null, ys2), y2 = Math.max.apply(null, ys2);
+    var rx = rc.offsetLeft - cv.offsetLeft, ry = rc.offsetTop - cv.offsetTop, m = 6;
+    rc.classList.toggle('dim', x1 < rx + rc.offsetWidth + m && x2 > rx - m && y1 < ry + rc.offsetHeight + m && y2 > ry - m);
   }
 
   function frame(now){
