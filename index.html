@@ -38,6 +38,7 @@
   --display:"LXGW WenKai TC","Noto Sans TC","PingFang TC","Microsoft JhengHei",serif;
   --body:"Noto Sans TC",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
   --radius:18px;
+  --good:#2A7548; --good-bg:#E1F0E6; --warn:#8F5C00; --warn-bg:#FAEDCF; --bad:#B5372F; --bad-bg:#F7DFDB; --slide:#2B649A; --slide-bg:#DCE9F5;
   --sat:env(safe-area-inset-top,0px); --sar:env(safe-area-inset-right,0px); --sab:env(safe-area-inset-bottom,0px); --sal:env(safe-area-inset-left,0px);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
@@ -48,6 +49,7 @@
   --ramp:#7D603F; --ramp-edge:#C9A36B; --wood:#E8CB96; --wood-back:#C9A671; --wood-edge:#5E3C1B;
   --hat:#141C2E; --face:#EFD3B4; --cg:#7DB2E2; --brass-fill:#E2B659;
   --mat-paper:#D9BC8C; --mat-paper-line:#9C7646; --mat-grip:#A3A8B0; --mat-grip-dot:#4E535B;
+  --good:#71C694; --good-bg:#16301F; --warn:#E8B95C; --warn-bg:#382B11; --bad:#F08B80; --bad-bg:#3A1C19; --slide:#83B6E4; --slide-bg:#15283B;
   color-scheme:dark; --cs:dark;
 }}
 :root[data-theme="dark"]{
@@ -58,6 +60,7 @@
   --ramp:#7D603F; --ramp-edge:#C9A36B; --wood:#E8CB96; --wood-back:#C9A671; --wood-edge:#5E3C1B;
   --hat:#141C2E; --face:#EFD3B4; --cg:#7DB2E2; --brass-fill:#E2B659;
   --mat-paper:#D9BC8C; --mat-paper-line:#9C7646; --mat-grip:#A3A8B0; --mat-grip-dot:#4E535B;
+  --good:#71C694; --good-bg:#16301F; --warn:#E8B95C; --warn-bg:#382B11; --bad:#F08B80; --bad-bg:#3A1C19; --slide:#83B6E4; --slide-bg:#15283B;
   color-scheme:dark; --cs:dark;
 }
 *{box-sizing:border-box}
@@ -105,7 +108,7 @@ button{cursor:pointer}
 h1{font-family:var(--display);font-size:clamp(28px,3.4vw,42px);line-height:1.15;font-weight:700;text-wrap:balance;color:var(--on-band)}
 .lede{font-size:15px;color:var(--on-band-soft);margin-top:4px;text-wrap:balance}
 .tabs{display:flex;gap:4px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:4px;max-width:100%}
-.tab{border:0;background:transparent;color:var(--on-band-soft);font-size:16px;font-weight:700;min-height:44px;padding:0 20px;border-radius:999px;white-space:nowrap}
+.tab{border:0;background:transparent;color:var(--on-band-soft);font-size:17px;font-weight:700;min-height:52px;padding:0 20px;border-radius:999px;white-space:nowrap}
 .tab[aria-selected="true"]{background:var(--on-band);color:var(--band)}
 .tab:hover:not([aria-selected="true"]){color:var(--on-band)}
 .tab:focus-visible{outline-color:var(--gold)}
@@ -128,45 +131,57 @@ html[data-page="start"] .tabs,html[data-page="start"] .band-tools,html[data-page
 /* simulator */
 .sim{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:20px;align-items:start}
 .stage{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;min-width:0}
-#scene{display:block;width:100%;aspect-ratio:16/10;max-width:100%;max-height:max(300px,calc(100dvh - 250px))}
+#scene{display:block;width:100%;aspect-ratio:16/10;max-width:100%;max-height:max(300px,calc(100dvh - 264px))}
 .stage-foot{display:flex;flex-wrap:wrap;gap:6px 20px;padding:12px 16px;border-top:1px solid var(--line);font-size:14px;color:var(--ink-soft)}
 .key{display:inline-flex;align-items:center;gap:8px}
 .key i{display:inline-block;flex:none}
+/* result: a strip under the animation on phones (it stays pinned with it), a card over the empty sky on wide screens */
+.result{--rc:var(--ink-soft);--rb:var(--surface-2);display:flex;flex-direction:column;gap:2px;min-height:98px;padding:9px 14px 10px;background:var(--rb);border-top:1px solid var(--line);border-left:6px solid var(--rc)}
+.result .verdict{font-family:var(--display);font-size:22px;font-weight:700;line-height:1.3;color:var(--rc)}
+.result .why,.result .try{font-size:16px;line-height:1.45}
+.result .try{font-weight:700}
+.result[data-kind="walk"]{--rc:var(--good);--rb:var(--good-bg)}
+.result[data-kind="stutter"]{--rc:var(--warn);--rb:var(--warn-bg)}
+.result[data-kind="slide"]{--rc:var(--slide);--rb:var(--slide-bg)}
+.result[data-kind="tip"]{--rc:var(--bad);--rb:var(--bad-bg)}
+@media (max-width:600px) and (min-height:701px){.result{min-height:134px}}
+@media (min-width:901px){.result{position:absolute;z-index:4;top:10px;right:72px;width:min(46%,430px);min-height:0;padding:10px 14px;border:1px solid var(--line);border-left:6px solid var(--rc);border-radius:12px;box-shadow:0 4px 12px var(--shadow)}}
+@media (max-height:700px){.result .why{display:none}}
 .k-cg{width:12px;height:12px;border-radius:50%;background:var(--cg)}
 .k-g{width:22px;border-top:2px dashed var(--cg)}
 .k-pv{width:14px;height:14px;border-radius:50%;border:2px dashed var(--coat)}
-.stage-note{flex-basis:100%;font-size:13px}
+.stage-note{flex-basis:100%;font-size:14px}
 .panel{display:flex;flex-direction:column;gap:16px;min-width:0}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;gap:22px}
 .control{display:flex;flex-direction:column;gap:6px;border:0;padding:0;margin:0;min-width:0}
 .control-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
 .control-head label,.control legend{font-weight:700;font-size:17px;padding:0}
 output{font-family:var(--display);font-size:26px;font-weight:700;color:var(--coat);font-variant-numeric:tabular-nums}
-input[type=range]{width:100%;accent-color:var(--coat);margin:0;height:44px;-webkit-appearance:none;appearance:none;background:transparent}
+input[type=range]{width:100%;accent-color:var(--coat);margin:0;height:52px;-webkit-appearance:none;appearance:none;background:transparent}
 input[type=range]::-webkit-slider-runnable-track{height:10px;border-radius:99px;background:var(--line-strong)}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:32px;height:32px;margin-top:-11px;border-radius:50%;background:var(--coat);border:4px solid var(--surface);box-shadow:0 1px 5px rgba(0,0,0,.35)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:40px;height:40px;margin-top:-15px;border-radius:50%;background:var(--coat);border:4px solid var(--surface);box-shadow:0 1px 5px rgba(0,0,0,.35)}
 input[type=range]::-moz-range-track{height:10px;border-radius:99px;background:var(--line-strong)}
-input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--coat);border:4px solid var(--surface)}
-/* the same 1–7 scale that is drawn on the wooden horse; ticks line up with the slider thumb (32px wide) */
-.ruler{display:flex;justify-content:space-between;padding:0 16px;margin-top:-8px;height:32px;font-size:13px;line-height:1;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+input[type=range]::-moz-range-thumb{width:32px;height:32px;border-radius:50%;background:var(--coat);border:4px solid var(--surface)}
+/* the same 1–7 scale that is drawn on the wooden horse; ticks line up with the slider thumb (40px wide) */
+.ruler{display:flex;justify-content:space-between;padding:0 20px;margin-top:-8px;height:34px;font-size:15px;line-height:1;color:var(--ink-soft);font-variant-numeric:tabular-nums}
 .ruler b,.ruler i{width:0;display:flex;flex-direction:column;align-items:center;font-weight:700}
 .ruler b::before{content:"";width:2px;height:9px;background:var(--ink-soft);margin-bottom:4px;flex:none}
 .ruler i::before{content:"";width:1.5px;height:5px;background:var(--line-strong);flex:none}
-.scale-labels{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-soft);margin-top:-4px}
+.scale-labels{display:flex;justify-content:space-between;font-size:15px;color:var(--ink-soft);margin-top:-4px}
 .presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.chipbtn{border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:12px;min-height:44px;padding:0 8px;font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
+.chipbtn{border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:12px;min-height:52px;padding:0 8px;font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
 .chipbtn:hover{border-color:var(--ink-soft)}
 .chipbtn[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
 .seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:4px}
 .seg input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
-.seg label{display:flex;align-items:center;justify-content:center;gap:10px;min-height:48px;border:1px solid var(--line);background:var(--surface-2);border-radius:12px;padding:6px 10px;cursor:pointer;font-size:16px;font-weight:700;text-align:center;line-height:1.3}
+.seg label{display:flex;align-items:center;justify-content:center;gap:10px;min-height:56px;border:1px solid var(--line);background:var(--surface-2);border-radius:12px;padding:6px 10px;cursor:pointer;font-size:17px;font-weight:700;text-align:center;line-height:1.3}
 .seg label .sw{width:18px;height:18px;border-radius:5px;flex:none;border:1px solid var(--line-strong)}
 .seg input:checked + label{border-color:var(--ink);background:var(--ink);color:var(--surface)}
 .seg input:focus-visible + label{outline:3px solid var(--focus);outline-offset:2px}
 .checks{display:flex;flex-direction:column}
-.checks label{display:flex;gap:12px;align-items:center;min-height:44px;cursor:pointer;font-size:16px}
-.checks input{accent-color:var(--coat);width:22px;height:22px;margin:0;flex:none}
-.btn{border:0;background:var(--coat);color:var(--on-coat);border-radius:14px;min-height:52px;padding:0 20px;font-size:18px;font-weight:700}
+.checks label{display:flex;gap:12px;align-items:center;min-height:48px;cursor:pointer;font-size:17px}
+.checks input{accent-color:var(--coat);width:26px;height:26px;margin:0;flex:none}
+.btn{border:0;background:var(--coat);color:var(--on-coat);border-radius:14px;min-height:64px;padding:0 20px;font-size:20px;font-weight:700}
 .btn:hover{filter:brightness(1.06)}
 .btn.ghost{background:var(--surface-2);color:var(--ink);border:1px solid var(--line-strong)}
 .btn:disabled{opacity:.5;cursor:default;filter:none}
@@ -174,7 +189,7 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;bac
 /* secrets */
 .sec-title{font-family:var(--display);font-size:clamp(26px,3.2vw,36px);line-height:1.2;text-wrap:balance;margin:0 0 14px}
 .subtabs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
-.subtab{border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:999px;min-height:46px;padding:0 20px;font-size:16px;font-weight:700;cursor:pointer}
+.subtab{border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:999px;min-height:52px;padding:0 20px;font-size:17px;font-weight:700;cursor:pointer}
 .subtab[aria-selected="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
 .secrets{display:block}
 .secret{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;display:flex;flex-direction:row;align-items:flex-start;gap:28px;min-width:0}
@@ -207,17 +222,17 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;bac
 .conv-title{font-weight:700;font-size:17px}
 .conv-grid{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:10px 12px;align-items:center}
 .conv-grid label{font-size:16px;display:flex;gap:6px;align-items:baseline}
-.conv-grid .unit{font-size:13px;color:var(--ink-soft)}
-.conv-grid input{width:100%;min-height:46px;font-size:18px;padding:6px 12px;border:1px solid var(--line-strong);border-radius:12px;background:var(--surface-2);color:var(--ink);font-variant-numeric:tabular-nums}
+.conv-grid .unit{font-size:14px;color:var(--ink-soft)}
+.conv-grid input{width:100%;min-height:52px;font-size:18px;padding:6px 12px;border:1px solid var(--line-strong);border-radius:12px;background:var(--surface-2);color:var(--ink);font-variant-numeric:tabular-nums}
 .conv-out{font-size:17px}
-.conv-note{font-size:14px;color:var(--ink-soft)}
+.conv-note{font-size:15px;color:var(--ink-soft)}
 .hgt{width:100%;border-collapse:collapse;text-align:center;font-variant-numeric:tabular-nums}
 .hgt th{font-size:14px;color:var(--ink-soft);font-weight:700;padding:4px}
 .hgt td{font-size:18px;font-weight:700;padding:8px 4px;border-top:1px solid var(--line)}
 
 /* full screen: a fixed layer that fills the device; upright phones get the view turned 90° so it works with rotation lock */
 .stage,.vbox{position:relative}
-.fsbtn{position:absolute;right:10px;bottom:10px;z-index:6;width:46px;height:46px;border-radius:12px;border:0;background:rgba(20,28,46,.66);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.fsbtn{position:absolute;right:10px;bottom:10px;z-index:6;width:52px;height:52px;border-radius:12px;border:0;background:rgba(20,28,46,.66);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .stage .fsbtn{bottom:auto;top:10px}
 .fsbtn .i-close{display:none}
 .is-fs .fsbtn .i-open{display:none}.is-fs .fsbtn .i-close{display:inline}
@@ -229,21 +244,23 @@ body.fs-on,body.fs-on #app{overflow:hidden}
 .vbox.is-fs{background:var(--video-bg)}
 .stage.is-fs.rot,.vbox.is-fs.rot{--it:var(--sar);--ir:var(--sab);--ib:var(--sal);--il:var(--top-gap);inset:auto;top:0;left:0;width:100vh;width:100dvh;height:100vw;transform-origin:top left;transform:translateX(100vw) rotate(90deg)}
 .is-fs #scene{width:100%;height:100%;aspect-ratio:auto;max-height:none}
+.stage.is-fs .result{position:absolute;z-index:4;top:calc(12px + var(--it));right:calc(170px + var(--ir));width:min(44%,420px);min-height:0;padding:8px 12px;border:1px solid var(--line);border-left:6px solid var(--rc);border-radius:12px}
+.stage.is-fs .fsctl.open ~ .result{display:none}
 .is-fs .stage-foot{display:none}
 .is-fs video{width:100%!important;height:100%!important;max-height:none;object-fit:contain;border:0!important;border-radius:0!important;aspect-ratio:auto!important}
 .is-fs .fsbtn{top:calc(12px + var(--it));right:calc(12px + var(--ir));bottom:auto}
 .fsctl,.fstog{display:none}
-.is-fs .fstog{display:flex;position:absolute;top:calc(12px + var(--it));right:calc(68px + var(--ir));z-index:8;height:46px;padding:0 14px;border-radius:12px;border:0;background:rgba(20,28,46,.66);color:#fff;font-size:16px;font-weight:700;align-items:center;gap:6px;cursor:pointer}
-.is-fs .fsctl.open{display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:10px 14px;position:absolute;top:calc(68px + var(--it));right:calc(12px + var(--ir));z-index:7;background:rgba(20,28,46,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:8px 10px;border-radius:14px;color:#fff;max-width:calc(100% - 24px - var(--il) - var(--ir))}
+.is-fs .fstog{display:flex;position:absolute;top:calc(12px + var(--it));right:calc(74px + var(--ir));z-index:8;height:52px;padding:0 16px;border-radius:12px;border:0;background:rgba(20,28,46,.66);color:#fff;font-size:16px;font-weight:700;align-items:center;gap:6px;cursor:pointer}
+.is-fs .fsctl.open{display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:10px 14px;position:absolute;top:calc(74px + var(--it));right:calc(12px + var(--ir));z-index:7;background:rgba(20,28,46,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:8px 10px;border-radius:14px;color:#fff;max-width:calc(100% - 24px - var(--il) - var(--ir))}
 .fsrow{display:flex;align-items:center;gap:6px}
 .fslab{font-size:13px;font-weight:700;opacity:.85;margin-right:2px}
-.fsctl button{min-width:48px;height:44px;padding:0 10px;border-radius:10px;border:0;background:rgba(255,255,255,.16);color:#fff;font-size:16px;font-weight:700;cursor:pointer}
+.fsctl button{min-width:52px;height:48px;padding:0 10px;border-radius:10px;border:0;background:rgba(255,255,255,.16);color:#fff;font-size:16px;font-weight:700;cursor:pointer}
 .fsctl button[aria-pressed="true"]{background:#fff;color:#1E2A44}
-.fsctl .fsstep{font-size:22px;width:48px}
+.fsctl .fsstep{font-size:22px;width:52px}
 .fsval{min-width:48px;text-align:center;font-size:22px;font-weight:800;color:#fff!important;font-family:inherit!important;font-variant-numeric:tabular-nums}
 
 .foot{margin-top:8px;padding:18px 0 4px;border-top:1px solid var(--line);text-align:center;font-size:13px;line-height:1.8;color:var(--ink-soft);display:flex;flex-direction:column;align-items:center;gap:4px}
-.ver{border:0;background:none;color:var(--ink-soft);font-size:13px;text-decoration:underline dotted;text-underline-offset:3px;min-height:40px;padding:0 12px}
+.ver{border:0;background:none;color:var(--ink-soft);font-size:13px;text-decoration:underline dotted;text-underline-offset:3px;min-height:44px;padding:0 12px}
 #diag{width:100%;max-width:640px;text-align:left;white-space:pre-wrap;word-break:break-all;font:12px/1.6 ui-monospace,Menlo,Consolas,monospace;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:12px;margin:0}
 
 /* tablets and phones held upright: one column, stage pinned to the top */
@@ -263,7 +280,7 @@ body.fs-on,body.fs-on #app{overflow:hidden}
   .secret{flex-direction:column;gap:16px;padding:14px}
   .vbox{width:100%;flex:none}
   .subtabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-  .subtab{padding:0 6px;font-size:15px;line-height:1.3}
+  .subtab{padding:0 6px;font-size:16px;line-height:1.3}
   .subtab .long{display:none}
   .secret .vhint{display:block}
   .home{grid-template-columns:1fr}
@@ -282,7 +299,7 @@ body.fs-on,body.fs-on #app{overflow:hidden}
   .eyebrow,.lede{display:none}
   h1{font-size:21px;white-space:nowrap}
   .tabs{order:0;width:auto;margin-left:auto}
-  .tab{min-height:40px;padding:0 14px;font-size:15px;flex:none}
+  .tab{min-height:44px;padding:0 14px;font-size:15px;flex:none}
   .iconbtn{width:44px;height:44px;font-size:22px}
   .start{flex-direction:row;justify-content:center;gap:32px}
   .start-art{width:min(46vh,190px)}
@@ -293,6 +310,10 @@ body.fs-on,body.fs-on #app{overflow:hidden}
   #scene{aspect-ratio:auto;height:calc(100dvh - var(--top-gap) - var(--sab) - 84px);min-height:190px;max-height:none}
   .stage-foot{display:none}
   .panel .card{gap:12px;padding:14px}
+  .btn{min-height:52px;font-size:18px}
+  .result{position:absolute;z-index:4;top:8px;right:70px;width:min(58%,320px);min-height:0;padding:6px 10px;border:1px solid var(--line);border-left:6px solid var(--rc);border-radius:10px}
+  .result .verdict{font-size:18px}
+  .result .try{font-size:15px}
 }
 /* 主畫面 App 高度：整個畫面由 #app 捲動，固定面板補上 100dvh 和實際高度的差 */
 @supports (height:100lvh){
@@ -346,13 +367,18 @@ body.fs-on,body.fs-on #app{overflow:hidden}
       <div class="sim">
         <div class="stage">
           <canvas id="scene" role="img" aria-label="士兵騎馬下坡的動畫"></canvas>
-          <button type="button" class="fstog" aria-expanded="false">⚙ 調整</button>
+          <button type="button" class="fstog" aria-expanded="false">調整</button>
           <div class="fsctl" aria-label="快速調整">
             <div class="fsrow"><span class="fslab">坡度</span><button type="button" class="fsstep" data-da="-1" aria-label="坡度減 1">−</button><output class="fsval" id="fsAngle">13°</output><button type="button" class="fsstep" data-da="1" aria-label="坡度加 1">＋</button><button type="button" data-a="13">13</button><button type="button" data-a="17">17</button><button type="button" data-a="21">21</button></div>
             <div class="fsrow"><span class="fslab">士兵</span><button type="button" class="fsstep" data-d="-0.5" aria-label="往馬尾">−</button><output class="fsval" id="fsScale">6</output><button type="button" class="fsstep" data-d="0.5" aria-label="往馬頭">＋</button></div>
             <div class="fsrow"><span class="fslab">地面</span><button type="button" data-s="grip">砂紙</button><button type="button" data-s="paper">木板</button></div>
           </div>
           <button class="fsbtn" type="button" aria-label="全螢幕"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path class="i-open" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><path class="i-close" d="M6 6l12 12M18 6L6 18"/></svg></button>
+          <div class="result" id="result" data-kind="pending" aria-live="polite">
+            <p class="verdict" id="resVerdict">？</p>
+            <p class="why" id="resWhy"></p>
+            <p class="try" id="resTry">看看它會怎麼走……先猜猜看！</p>
+          </div>
           <div class="stage-foot">
             <span class="key"><i class="k-cg"></i>重心</span>
             <span class="key"><i class="k-g"></i>重力往下拉的方向</span>
@@ -365,7 +391,7 @@ body.fs-on,body.fs-on #app{overflow:hidden}
           <div class="card">
             <div class="control">
               <div class="control-head"><label for="slope">坡度</label><output id="slopeOut" for="slope">13°</output></div>
-              <input type="range" id="slope" min="0" max="30" step="1" value="13">
+              <input autocomplete="off" type="range" id="slope" min="0" max="30" step="1" value="13">
               <div class="presets">
                 <button class="chipbtn" type="button" data-angle="13" aria-pressed="true">13°</button>
                 <button class="chipbtn" type="button" data-angle="17" aria-pressed="false">17°</button>
@@ -374,36 +400,29 @@ body.fs-on,body.fs-on #app{overflow:hidden}
             </div>
             <div class="control">
               <div class="control-head"><label for="rider">士兵位置</label><output id="riderOut" for="rider">刻度 6</output></div>
-              <input type="range" id="rider" min="1" max="7" step="0.5" value="6">
+              <input autocomplete="off" type="range" id="rider" min="1" max="7" step="0.5" value="6">
               <div class="ruler" aria-hidden="true"><b>1</b><i></i><b>2</b><i></i><b>3</b><i></i><b>4</b><i></i><b>5</b><i></i><b>6</b><i></i><b>7</b></div>
               <div class="scale-labels"><span>← 馬尾</span><span>馬頭 →</span></div>
             </div>
             <fieldset class="control">
               <legend>地面</legend>
               <div class="seg">
-                <input type="radio" name="surface" id="surf-paper" value="paper"><label for="surf-paper"><span class="sw" style="background:var(--mat-paper)"></span>木板</label>
-                <input type="radio" name="surface" id="surf-grip" value="grip" checked><label for="surf-grip"><span class="sw" style="background:var(--mat-grip)"></span>砂紙</label>
+                <input autocomplete="off" type="radio" name="surface" id="surf-paper" value="paper"><label for="surf-paper"><span class="sw" style="background:var(--mat-paper)"></span>木板</label>
+                <input autocomplete="off" type="radio" name="surface" id="surf-grip" value="grip" checked><label for="surf-grip"><span class="sw" style="background:var(--mat-grip)"></span>砂紙</label>
               </div>
             </fieldset>
             <fieldset class="control">
               <legend>坡道</legend>
               <div class="seg">
-                <input type="radio" name="len" id="len-short" value="short"><label for="len-short">桌上短坡道</label>
-                <input type="radio" name="len" id="len-long" value="long" checked><label for="len-long">前面長坡道</label>
+                <input autocomplete="off" type="radio" name="len" id="len-short" value="short"><label for="len-short">桌上短坡道</label>
+                <input autocomplete="off" type="radio" name="len" id="len-long" value="long" checked><label for="len-long">前面長坡道</label>
               </div>
             </fieldset>
             <div class="checks">
-              <label for="showCg"><input type="checkbox" id="showCg" checked>顯示重心和重力線</label>
-              <label for="guess" hidden style="display:none"><input type="checkbox" id="guess">先猜再看：走完才顯示結果</label>
+              <label for="showCg"><input autocomplete="off" type="checkbox" id="showCg" checked>顯示重心和重力線</label>
+              <label for="guess" hidden style="display:none"><input autocomplete="off" type="checkbox" id="guess" checked>先猜再看：走完才顯示結果</label>
             </div>
             <button class="btn" id="replay" type="button">重新放上坡道</button>
-          </div>
-
-          <div class="result" id="result" data-kind="pending" aria-live="polite" hidden style="display:none">
-            <p class="label">結果</p>
-            <p class="verdict" id="resVerdict">？</p>
-            <p class="why" id="resWhy">看看它會怎麼走……先猜猜看！</p>
-            <p class="try" id="resTry"></p>
           </div>
 
         </div>
@@ -464,7 +483,7 @@ body.fs-on,body.fs-on #app{overflow:hidden}
             <li>找一塊硬的板子當坡道（墊板、木板、厚紙板都可以）。</li>
             <li>一端用書本墊高，另一端放在桌上。</li>
             <li>板子上鋪一條毛巾或砂紙，讓地面抓得住木馬的腳。</li>
-            <li>量板子長度和書疊高度，填到右邊，就知道坡度是幾度。</li>
+            <li>量板子長度和書疊高度，填到換算表，就知道坡度是幾度。</li>
           </ol>
           <p class="home-tip">挑戰看看：坡越陡，士兵要往馬頭還是馬尾移？</p>
         </div>
@@ -472,9 +491,9 @@ body.fs-on,body.fs-on #app{overflow:hidden}
           <p class="conv-title">書本高度換算角度</p>
           <div class="conv-grid">
             <label for="rampLen">坡道板長度<span class="unit">公分</span></label>
-            <input type="number" id="rampLen" min="1" step="0.5" value="40" inputmode="decimal">
+            <input autocomplete="off" type="number" id="rampLen" min="1" step="0.5" value="40" inputmode="decimal">
             <label for="rampHeight">書疊總高度<span class="unit">公分</span></label>
-            <input type="number" id="rampHeight" min="0" step="0.5" value="9" inputmode="decimal">
+            <input autocomplete="off" type="number" id="rampHeight" min="0" step="0.5" value="9" inputmode="decimal">
           </div>
           <p class="conv-out">大約 <output id="convOut" for="rampLen rampHeight">13°</output></p>
           <p class="conv-note" id="convNote">量坡道板的長度，和墊高那一端的書疊高度。</p>
@@ -550,7 +569,7 @@ body.fs-on,body.fs-on #app{overflow:hidden}
   var D2R = Math.PI / 180;
   var LEG = 85, RP = {x:-80, y:-85}, ALPHA = 30 * D2R, STRIDE = LEG * Math.sin(ALPHA), ROCK = 7 * D2R, TIP = 55 * D2R;
   var SURF = { ice:{name:'玻璃', mu:0.12}, paper:{name:'木板', mu:0.35}, felt:{name:'毛氈布', mu:0.55}, grip:{name:'砂紙', mu:0.75} };
-  var st = { theta:13, p:16.67, s:6, surface:'grip', cg:true, guess:false, len:'long', cm:42 };
+  var st = { theta:13, p:16.67, s:6, surface:'grip', cg:true, guess:true, len:'long', cm:42 };
   function s2p(v){ return (7 - v) / 6 * 100; }
   var run = null, revealedKey = '', restartTimer = 0;
 
@@ -580,7 +599,7 @@ body.fs-on,body.fs-on #app{overflow:hidden}
       case 'slide': return [ev.reason === 'ice' ? '玻璃太滑了，腳抓不住地面，整隻直接滑下去，沒有一步一步走。' : '坡太陡、木板又不夠粗，腳抓不住，整隻直接滑下去。', '試試看：換成砂紙，或把坡度調小。'];
       case 'tip': return [ev.reason === 'front' ? '士兵坐太前面，重心跑到前腳前面，一走就往前倒。' : '坡太陡，身體往前倒得太快，後腳來不及接住。', ev.reason === 'front' ? '試試看：把士兵往馬尾移一點（數字變小）。' : '試試看：把坡度調小一點。'];
       default:
-        if (ev.reason === 'flat') return ['幾乎是平地，沒有重力往下拉，搖一搖就停了。', '試試看：把坡度調高一點。'];
+        if (ev.reason === 'flat') return ['幾乎是平地，重力沒辦法把它往坡下拉，搖一搖就停了。', '試試看：把坡度調高一點。'];
         if (ev.reason === 'back') return ['士兵坐太後面，身體往後坐，走一步就卡住了。', '試試看：把士兵往馬頭移一點（數字變大）。'];
         return ['坡度有點不夠，走兩步就停下來。', '試試看：坡度再調高一點點。'];
     }
@@ -595,8 +614,8 @@ body.fs-on,body.fs-on #app{overflow:hidden}
   function hideResult(){
     $('result').dataset.kind = 'pending';
     $('resVerdict').textContent = '？';
-    $('resWhy').textContent = '看看它會怎麼走……先猜猜看！';
-    $('resTry').textContent = '';
+    $('resWhy').textContent = '';
+    $('resTry').textContent = '看看它會怎麼走……先猜猜看！';
   }
 
   function geom(){
@@ -604,7 +623,7 @@ body.fs-on,body.fs-on #app{overflow:hidden}
     var baseY = H * 0.9, ex = W * 0.94, topMin = 258 * k;
     var Lr = 0.86 * W / c;
     if (s > 1e-6) Lr = Math.min(Lr, (baseY - topMin) / s);
-    Lr *= st.cm / Math.max(42, st.cm);
+    Lr *= Math.max(0.6, st.cm / Math.max(42, st.cm));
     return { k:k, th:th, c:c, s:s, baseY:baseY, A:{x:ex - Lr * c, y:baseY - Lr * s}, B:{x:ex, y:baseY}, Lr:Lr, Lu: k > 0 ? Lr / k : 0 };
   }
 
@@ -796,8 +815,9 @@ body.fs-on,body.fs-on #app{overflow:hidden}
     ctx.fillText('地面：' + SURF[st.surface].name, Math.max(12, 20 * k), g.baseY + (H - g.baseY) / 2);
     if (run) {
       var el = Math.min((performance.now() - run.start) / 1000, run.dur);
-      var txt = run.ev.kind === 'walk' ? '⏱ ' + el.toFixed(1) + ' 秒' : (run.done ? '⏱ × 沒走到底' : '⏱ ' + el.toFixed(1) + ' 秒');
+      var txt = run.ev.kind === 'walk' || !run.done ? '時間 ' + el.toFixed(1) + ' 秒' : '沒走到底';
       ctx.font = '700 ' + Math.max(18, 34 * k) + 'px "Noto Sans TC",sans-serif';
+      var timerW = ctx.measureText(txt).width;
       ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.fillStyle = run.ev.kind === 'walk' ? P.ink : P.coat;
       ctx.fillText(txt, Math.max(12, 24 * k), Math.max(12, 24 * k));
     }
@@ -815,13 +835,26 @@ body.fs-on,body.fs-on #app{overflow:hidden}
       else if (kind === 'slide') { t0 = 0.35; bt = '咻～'; bc = '#2E6DA4'; }
       else if (kind === 'walk') { t0 = run.dur; bt = '成功！'; bc = '#2e7d32'; }
       if (bt && el2 > t0) {
-        var pop = Math.min(1, (el2 - t0) / 0.18), bs = (0.6 + 0.4 * pop) * Math.min(0.75, k * 0.75);
+        var pop = Math.min(1, (el2 - t0) / 0.18), bs = (0.6 + 0.4 * pop) * Math.max(0.44, Math.min(0.75, k * 0.75));
         var bw = bt.length > 3 ? 124 : 92, bh = 46;
         // the soldier speaks: tail points at his head
         var hd = toWorld({ x:riderU(st.p), y:-186 }, pose(Math.min(el2, run.dur)), g);
         var gap = 70 * bs, cx2 = hd.x - (bw * 0.35) * bs, cy2 = hd.y - (bh + 20) * bs - gap;
         if (cy2 < bh * bs + 8) { cy2 = Math.max(bh * bs + 8, hd.y - 40 * bs); cx2 = hd.x - (bw + 40) * bs - gap * 0.6; if (cx2 < (bw + 8) * bs) cx2 = hd.x + (bw + 40) * bs + gap * 0.6; }
         cx2 = Math.max((bw + 8) * bs, Math.min(cx2, W - (bw + 8) * bs));
+        var tLeft = Math.max(12, 24 * k), tBot = tLeft + Math.max(18, 34 * k) + 6;
+        if (cx2 - bw * bs < tLeft + timerW + 8 && cy2 - bh * bs < tBot) cx2 = Math.min(tLeft + timerW + 12 + bw * bs, W - (bw + 8) * bs);
+        // on wide screens the result card sits over the sky: keep the bubble clear of it
+        var rc = $('result');
+        if (getComputedStyle(rc).position === 'absolute') {
+          var rx = rc.offsetLeft - cv.offsetLeft, ry = rc.offsetTop - cv.offsetTop, rw = rc.offsetWidth, rh = rc.offsetHeight;
+          var overCard = function(){ return cx2 + bw * bs > rx - 6 && cx2 - bw * bs < rx + rw + 6 && cy2 + bh * bs > ry - 6 && cy2 - bh * bs < ry + rh + 6; };
+          if (overCard()) {
+            cx2 = Math.max((bw + 8) * bs, rx - 10 - bw * bs);
+            if (overCard()) cy2 = ry + rh + 10 + bh * bs;
+            if (cx2 - bw * bs < tLeft + timerW + 8) cy2 = Math.max(cy2, tBot + bh * bs);
+          }
+        }
         var ang = Math.atan2(hd.y - cy2, hd.x - cx2), dist = Math.hypot(hd.x - cx2, hd.y - cy2);
         var tip = { x:hd.x - Math.cos(ang) * 18 * k, y:hd.y - Math.sin(ang) * 18 * k };
         var b1 = { x:cx2 + Math.cos(ang - 0.28) * bw * 0.8 * bs, y:cy2 + Math.sin(ang - 0.28) * bh * 0.8 * bs };
@@ -865,7 +898,6 @@ body.fs-on,body.fs-on #app{overflow:hidden}
     requestAnimationFrame(frame);
     if (!W || $('view-sim').hidden || !run) return;
     var t = (now - run.start) / 1000;
-    if (reduce.matches) t = run.dur;
     if (!run.done && t >= run.dur) {
       run.done = true; revealedKey = key(); showResult(run.ev);
       run.loopAt = now + 2200;
@@ -966,6 +998,7 @@ body.fs-on,body.fs-on #app{overflow:hidden}
     var a = $('answer'), open = a.hidden;
     a.hidden = !open; this.setAttribute('aria-expanded', open ? 'true' : 'false');
     this.textContent = open ? '收起答案' : '揭曉：小馬的電池是什麼？';
+    if (open) a.scrollIntoView({ block:'center', behavior: reduce.matches ? 'auto' : 'smooth' });
   });
 
 
@@ -975,10 +1008,11 @@ body.fs-on,body.fs-on #app{overflow:hidden}
   function fsToggle(box){
     if (fsEl) { if (typeof fsOpen === 'function') fsOpen(false); fsEl.classList.remove('is-fs','rot'); document.body.classList.remove('fs-on'); fsEl = null; }
     else { fsEl = box; box.classList.add('is-fs'); document.body.classList.add('fs-on'); }
+    document.querySelectorAll('.fsbtn').forEach(function(x){ x.setAttribute('aria-label', x.parentNode === fsEl ? '離開全螢幕' : '全螢幕'); });
     fsLayout(); if (typeof restart === 'function' && box.classList.contains('stage')) restart();
   }
   document.querySelectorAll('.fsbtn').forEach(function(b){
-    b.addEventListener('click', function(e){ e.stopPropagation(); fsToggle(b.parentNode); b.setAttribute('aria-label', fsEl ? '離開全螢幕' : '全螢幕'); });
+    b.addEventListener('click', function(e){ e.stopPropagation(); fsToggle(b.parentNode); });
   });
   window.addEventListener('resize', fsLayout);
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && fsEl) fsToggle(fsEl); });
@@ -999,7 +1033,7 @@ body.fs-on,body.fs-on #app{overflow:hidden}
   document.querySelectorAll('input[name=surface]').forEach(function(r){ r.addEventListener('change', fsSync); });
   fsSync();
   var fsctl = document.querySelector('.fsctl'), fstog = document.querySelector('.fstog'), fsHide = 0;
-  function fsOpen(on){ fsctl.classList.toggle('open', on); fstog.setAttribute('aria-expanded', String(on)); fstog.textContent = on ? '✓ 收起' : '⚙ 調整'; clearTimeout(fsHide); if (on) fsHide = setTimeout(function(){ fsOpen(false); }, 5000); }
+  function fsOpen(on){ fsctl.classList.toggle('open', on); fstog.setAttribute('aria-expanded', String(on)); fstog.textContent = on ? '收起' : '調整'; clearTimeout(fsHide); if (on) fsHide = setTimeout(function(){ fsOpen(false); }, 8000); }
   fstog.addEventListener('click', function(e){ e.stopPropagation(); fsOpen(!fsctl.classList.contains('open')); });
   fsctl.addEventListener('click', function(){ fsOpen(true); });
   /* ---------- offline: file:// and in-app browsers without service worker simply skip this ---------- */
