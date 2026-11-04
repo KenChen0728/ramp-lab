@@ -15,9 +15,9 @@ var INDEX = BASE + 'index.html';
 var NET_WAIT = 3000; /* 導覽請求等網路的最長時間，超過就先開快取 */
 
 var FILES = ['manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png',
-  'media/secret1.jpg', 'media/secret2.jpg', 'media/secret3.jpg'];
+  'media/start.jpg', 'media/home-art.png', 'media/secret1.jpg', 'media/secret2.jpg', 'media/secret3.jpg'];
 var VIDEOS = ['media/secret1.mp4', 'media/secret2.mp4', 'media/secret3.mp4'];
-var HELP = [];
+var HELP = ['sim1', 'sim2', 'sim3', 'sim4', 'sim5', 'sec1', 'sec2', 'sec3', 'sec4', 'home1', 'home2', 'home3', 'home4', 'ins1', 'ins2', 'ins3', 'ins4', 'ins5'].map(function(n){ return 'help/' + n + '.jpg'; });
 
 function abs(u){ return new URL(u, BASE).href; }
 
