@@ -23,7 +23,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" media="print" onload="this.media='all'">
 <style>
 /* Layout: classroom tool dressed like the Nutcracker deck — a navy uniform band (snow + red/gold braid) holds the name and three tabs; below, one big stage beside a narrow control column. On phones the stage sticks to the top while the controls scroll under it; in full screen the stage fills the device, rotated when the phone is upright. */
 :root{
@@ -143,12 +143,18 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;bac
 .secret{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;display:flex;flex-direction:row;align-items:flex-start;gap:28px;min-width:0}
 .vbox{position:relative;flex:0 0 62%;width:62%;min-width:0}
 .secret video{display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:contain;background:var(--video-bg);border-radius:12px;border:1px solid var(--line)}
+.vplay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;display:flex;align-items:center;justify-content:center;gap:10px;min-height:64px;max-width:calc(100% - 24px);padding:8px 22px;border:0;border-radius:16px;background:rgba(20,28,46,.86);color:#fff;font-size:18px;font-weight:700;line-height:1.35;text-align:center;cursor:pointer}
+.vplay svg{flex:none}
+.vplay[data-s="wait"]{min-height:44px;padding:6px 16px;font-size:16px;background:rgba(20,28,46,.66);pointer-events:none;animation:vfade .5s .5s both}
+.vplay[data-s="wait"] svg{display:none}
+@keyframes vfade{from{opacity:0}to{opacity:1}}
 .secret-text{display:flex;flex-direction:column;gap:12px;min-width:0;flex:1}
 .secret .num{font-size:14px;font-weight:700;letter-spacing:.14em;color:var(--coat)}
 .secret h2{font-family:var(--display);font-size:clamp(28px,3vw,38px);line-height:1.2}
 .secret p{font-size:18px;line-height:1.75}
 .secret .where{padding-top:12px;border-top:1px dashed var(--line-strong);font-size:16px;color:var(--ink-soft)}
 .secret .where b{color:var(--gold-ink)}
+.secret .vhint{display:none;font-size:15px;line-height:1.5;color:var(--ink-soft)}
 .reveal{display:flex;flex-direction:column;align-items:center;gap:14px;padding:22px 0 4px;text-align:center}
 .answer{font-family:var(--display);font-size:clamp(36px,6vw,64px);font-weight:700;color:var(--coat);line-height:1.2;text-wrap:balance}
 .answer-sub{font-size:18px;color:var(--ink-soft);max-width:36em;margin-inline:auto}
@@ -218,6 +224,7 @@ body.fs-on{overflow:hidden}
   .subtabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
   .subtab{padding:0 6px;font-size:15px;line-height:1.3}
   .subtab .long{display:none}
+  .secret .vhint{display:block}
   .home{grid-template-columns:1fr}
 }
 @media (max-width:600px){
@@ -809,12 +816,46 @@ body.fs-on{overflow:hidden}
   convert();
 
   /* ---------- secrets ---------- */
+  /* 影片：平常不呼叫 load()，斷線時才不會把已下載的影片清掉；只有上次失敗才重新載入。
+     自動播放被擋（iPhone 省電模式）時顯示大按鈕；按了還是被擋，就打開影片內建的控制列。 */
+  var VSVG = '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M7 4.5v15l13-7.5z" fill="currentColor"/></svg>';
+  var VTEXT = { wait:'影片載入中…', tap:'點這裡播放', fail:'影片載不到，點這裡再試一次' };
+  function vState(v, s){
+    var b = v.parentNode.querySelector('.vplay'); if (!b) return;
+    clearTimeout(v._slow);
+    b.hidden = !s; b.dataset.s = s || '';
+    if (s) b.innerHTML = VSVG + '<span>' + VTEXT[s] + '</span>';
+    if (s === 'wait') v._slow = setTimeout(function(){ if (v.paused || v.readyState < 3) vState(v, 'fail'); }, 15000);
+  }
+  function vPlay(v, tapped){
+    if (v.error || v.networkState === 3) v.load();
+    v.muted = true; v.loop = true;
+    if (v.readyState < 3) vState(v, 'wait');
+    var p = v.play();
+    if (p && p.catch) p.catch(function(e){
+      var n = e && e.name;
+      if (n === 'AbortError') return;
+      if (n === 'NotAllowedError') { if (tapped) { v.controls = true; vState(v, ''); } else vState(v, 'tap'); }
+      else vState(v, 'fail');
+    });
+  }
+  function shownVideo(){ return $('view-secrets').hidden ? null : document.querySelector('.secret:not([hidden]) video'); }
+  document.querySelectorAll('.vbox').forEach(function(box){
+    var v = box.querySelector('video'), b = document.createElement('button');
+    b.type = 'button'; b.className = 'vplay'; b.hidden = true; box.insertBefore(b, v.nextSibling);
+    b.addEventListener('click', function(e){ e.stopPropagation(); vPlay(v, true); });
+    v.addEventListener('click', function(){ if (v.paused && !v.controls) vPlay(v, true); });
+    v.addEventListener('playing', function(){ vState(v, ''); });
+    v.addEventListener('error', function(){ if (shownVideo() === v) vState(v, 'fail'); });
+    var note = document.createElement('p'); note.className = 'vhint'; note.textContent = '字太小嗎？按影片右下角的方框，就能看大畫面。';
+    box.parentNode.insertBefore(note, box.nextSibling);
+  });
+  window.addEventListener('online', function(){ var v = shownVideo(); if (v && v.paused) vPlay(v); });
   function syncVideos(){
-    var on = !$('view-secrets').hidden;
-    document.querySelectorAll('.secret').forEach(function(a){
-      var v = a.querySelector('video'); if (!v) return;
-      if (on && !a.hidden) { v.muted = true; var p = v.play(); if (p && p.catch) p.catch(function(){}); }
-      else if (!v.paused) v.pause();
+    var cur = shownVideo();
+    document.querySelectorAll('.secret video').forEach(function(v){
+      if (v === cur) vPlay(v);
+      else { if (!v.paused) v.pause(); vState(v, ''); }
     });
   }
   var subs = Array.prototype.slice.call(document.querySelectorAll('.subtab'));
@@ -825,8 +866,8 @@ body.fs-on{overflow:hidden}
       var on = a.dataset.sec === k; a.hidden = !on;
       var v = a.querySelector('video');
       if (!v) return;
-      if (on) { v.muted = true; v.loop = true; v.load(); var p = v.play(); if (p && p.catch) p.catch(function(){}); }
-      else v.pause();
+      if (on) { try { v.currentTime = 0; } catch (e) {} vPlay(v); }
+      else { v.pause(); vState(v, ''); }
     });
   }); });
   $('revealBtn').addEventListener('click', function(){
