@@ -94,15 +94,15 @@ tr.pending td{color:var(--soft)}
   <div class="head">
     <a class="back" href="./#sim">← 回下坡實驗室</a>
     <h1>坡道紀錄</h1>
-    <p class="sub">在家用書本坡道測你的騎兵：選好條件 → 按開始放手 → 碰到坡底按停止 → 選結果。沒放好就按「重測」，不會記錄。</p>
+    <p class="sub">記錄你自己的下坡實驗：坡度、地面、士兵位置都可以自由改，看看怎樣走得最好。按開始放手，到底或停下來時按停止，再選結果；沒放好就按「重測」，不會記錄。</p>
   </div>
 
   <details class="card how">
-    <summary>怎麼用？（點開看）</summary>
+    <summary>沒有坡道怎麼辦？怎麼記錄？（點開看）</summary>
     <ol>
-      <li>用書本把板子一端墊高，板子上鋪毛巾或砂紙。</li>
+      <li>找一塊板子，一端用書本墊高就是坡道；上面鋪什麼都可以試試看。</li>
       <li>不知道幾度？到<a href="./#home">在家玩</a>輸入板長和書疊高度，就算得出來。</li>
-      <li>在下面選好坡度、地面和士兵刻度。</li>
+      <li>坡度用 − ＋ 調成你的坡度；地面選最接近的，沒有就選「其他」。</li>
       <li>按「開始」同時放手，木馬走到底、卡住或倒下時按「停止」，再選結果。</li>
       <li>紀錄存在這支手機。想留下來或傳給別人，按最下面「複製全部結果」貼到 LINE 或備忘錄。</li>
     </ol>
@@ -159,7 +159,7 @@ tr.pending td{color:var(--soft)}
   </section>
 
   <footer class="foot">
-    <button type="button" class="ver" id="verBtn" aria-expanded="false" aria-controls="diag">版本 2026.11.07-4</button>
+    <button type="button" class="ver" id="verBtn" aria-expanded="false" aria-controls="diag">版本 2026.11.07-5</button>
     <pre id="diag" hidden></pre>
   </footer>
 </main>
@@ -167,7 +167,7 @@ tr.pending td{color:var(--soft)}
 
 <script>
 (function(){
-  var VERSION='2026.11.07-4';
+  var VERSION='2026.11.07-5';
   var ANG=[13,17,21], SURF=[['grip','砂紙'],['wood','木板'],['other','其他']];
   var SYM={ok:'○',meh:'△',stuck:'卡',tip:'倒'}, NAME={ok:'順',meh:'不太順',stuck:'卡住',tip:'往前倒'};
   var SNAME={grip:'砂紙',wood:'木板',other:'其他'};

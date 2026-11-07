@@ -6,7 +6,7 @@
 
    改版時：把 VERSION 改成和 index.html 一樣，舊的網頁快取會自動清掉。
    影片內容換掉時：才把 MEDIA 後面的數字加 1，不然每次改版都要重新下載影片。 */
-var VERSION = '2026.11.07-4';
+var VERSION = '2026.11.07-5';
 var PREFIX = 'ramp-lab-';
 var CACHE = PREFIX + VERSION;
 var MEDIA = PREFIX + 'media-1';
