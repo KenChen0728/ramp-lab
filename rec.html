@@ -70,6 +70,7 @@ tr.pending td{color:var(--soft)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .row-actions{display:flex;gap:8px;margin-top:12px}
 .row-actions button{flex:1;border:1px solid var(--line);background:var(--chip);color:var(--ink);border-radius:12px;min-height:48px;font-size:16px;font-weight:700}
+#clear.arm{background:var(--red);color:#fff;border-color:var(--red)}
 #copyBox{width:100%;min-height:120px;margin-top:10px;font:13px/1.5 ui-monospace,Menlo,monospace;border:1px solid var(--line);border-radius:10px;background:var(--chip);color:var(--ink);padding:8px}
 .status{font-size:13px;color:var(--soft);margin:8px 0 0;line-height:1.5}
 .status.warn{color:var(--red);font-weight:700}
@@ -127,13 +128,14 @@ tr.pending td{color:var(--soft)}
     <div class="tbl"><table id="log"></table></div>
     <div class="row-actions">
       <button type="button" id="copy">複製全部結果</button>
+      <button type="button" id="clear">清空紀錄</button>
     </div>
     <textarea id="copyBox" readonly hidden aria-label="全部結果的文字"></textarea>
     <p class="status" id="status" role="status">連線中…</p>
   </section>
 
   <footer class="foot">
-    <button type="button" class="ver" id="verBtn" aria-expanded="false" aria-controls="diag">版本 2026.11.07-1</button>
+    <button type="button" class="ver" id="verBtn" aria-expanded="false" aria-controls="diag">版本 2026.11.07-2</button>
     <pre id="diag" hidden></pre>
   </footer>
 </main>
@@ -141,7 +143,7 @@ tr.pending td{color:var(--soft)}
 
 <script>
 (function(){
-  var VERSION='2026.11.07-1';
+  var VERSION='2026.11.07-2';
   var ANG=[13,17,21], SURF=[['grip','砂紙'],['wood','木板']];
   var SYM={ok:'○',meh:'△',stuck:'卡',tip:'倒'}, NAME={ok:'順',meh:'不太順',stuck:'卡住',tip:'往前倒'};
   var SNAME={grip:'砂紙',wood:'木板'};
@@ -311,6 +313,17 @@ tr.pending td{color:var(--soft)}
     try{ navigator.clipboard.writeText(t).then(done, fallback); }catch(e){ fallback(); }
   };
 
+  /* ---------- clear all (tap twice, then 復原 is offered) ---------- */
+  var clearArm=0;
+  $('clear').onclick=function(){
+    var b=this;
+    if(!allRows().length){ toast('目前沒有紀錄。'); return; }
+    if(!clearArm){ b.textContent='確定清空？再按一次'; b.classList.add('arm'); clearArm=setTimeout(function(){ clearArm=0; b.textContent='清空紀錄'; b.classList.remove('arm'); },4000); return; }
+    clearTimeout(clearArm); clearArm=0; b.textContent='清空紀錄'; b.classList.remove('arm');
+    var keepP=pend.slice(), keepC=cloud.slice(), n=keepP.length+keepC.length;
+    pend=[]; cloud=[]; persist(); render();
+    toast('已清空 '+n+' 筆紀錄', function(){ pend=keepP; cloud=keepC; persist(); render(); });
+  };
   /* ---------- version + device info ---------- */
   function diag(){
     var p=document.createElement('div');
