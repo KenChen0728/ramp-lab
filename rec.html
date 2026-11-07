@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1E2A44">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}</style>
+<title>坡道紀錄・胡桃鉗下坡實驗室</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one narrow column for a phone held in one hand — conditions, then the big timer, then results. Colors follow the Nutcracker deck: paper beige, navy ink, uniform red. */
+:root{
+  --bg:#F1ECE2; --card:#FFFDF8; --chip:#F5EFE3; --ink:#1E2A44; --soft:#5B6477; --line:#E0D7C6;
+  --red:#B5372F; --green:#2E7D32; --amber:#A8650A; --slate:#5B6475; --gold:#C9962E; --on:#FFFFFF;
+  --toast:#1E2A44; --on-toast:#F6F0E4; --focus:#2E6DA4;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0F1626; --card:#18223A; --chip:#202C46; --ink:#F1ECE2; --soft:#AEB6C6; --line:#2C3955;
+  --red:#D9574B; --green:#3E8E44; --amber:#B9781A; --slate:#58627A; --gold:#E2B659; --on:#FFFFFF;
+  --toast:#F1ECE2; --on-toast:#1E2A44; --focus:#7DB2E2; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0F1626; --card:#18223A; --chip:#202C46; --ink:#F1ECE2; --soft:#AEB6C6; --line:#2C3955;
+  --red:#D9574B; --green:#3E8E44; --amber:#B9781A; --slate:#58627A; --gold:#E2B659; --on:#FFFFFF;
+  --toast:#F1ECE2; --on-toast:#1E2A44; --focus:#7DB2E2; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;-webkit-tap-highlight-color:transparent;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 96px}
+main{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+button{font:inherit;cursor:pointer}
+button:disabled{cursor:default;opacity:.45}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+a.back{color:var(--soft);font-size:15px;font-weight:700;text-decoration:none;align-self:flex-start;padding:6px 0}
+h1{font-size:24px;margin:0;font-weight:900;letter-spacing:.02em}
+.head{display:flex;flex-direction:column;gap:4px}
+.head::after{content:"";height:6px;margin-top:8px;border-radius:3px;background:linear-gradient(var(--gold) 0 1px,var(--red) 1px 5px,var(--gold) 5px 6px)}
+.sub{color:var(--soft);font-size:14px;margin:0;line-height:1.6}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+.lab{font-size:14px;color:var(--soft);margin:0 0 8px;font-weight:700}
+.lab + .seg, .lab + .stepper{margin-bottom:2px}
+.gap{margin-top:14px}
+.seg{display:grid;gap:8px}
+.seg.c3{grid-template-columns:repeat(3,1fr)}.seg.c2{grid-template-columns:repeat(2,1fr)}
+.seg button{border:1px solid var(--line);background:var(--chip);color:var(--ink);border-radius:12px;min-height:50px;font-size:19px;font-weight:800}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.stepper{display:flex;align-items:center;gap:10px}
+.stepper button{width:60px;height:60px;border-radius:14px;border:1px solid var(--line);background:var(--chip);color:var(--ink);font-size:30px;font-weight:800}
+.stepper output{flex:1;text-align:center;font-size:42px;font-weight:900;font-variant-numeric:tabular-nums}
+.timer{font-variant-numeric:tabular-nums;font-size:66px;font-weight:900;text-align:center;margin:2px 0 10px;letter-spacing:1px;line-height:1.1}
+.go{width:100%;border:0;border-radius:18px;min-height:76px;font-size:28px;font-weight:900;color:var(--on);background:var(--green)}
+.go.running{background:var(--red)}
+.res{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.res button{border:0;border-radius:14px;min-height:60px;font-size:21px;font-weight:900;color:var(--on)}
+.r-ok{background:var(--green)}.r-meh{background:var(--amber)}.r-stuck{background:var(--slate)}.r-tip{background:var(--red)}
+.res .redo{grid-column:1/-1;background:transparent;color:var(--soft);border:1px dashed var(--soft);font-size:17px;min-height:50px}
+.hint{color:var(--soft);font-size:14px;text-align:center;margin:10px 0 0}
+.tbl{overflow-x:auto;margin-inline:-4px}
+table{width:100%;border-collapse:collapse;font-size:15px;font-variant-numeric:tabular-nums}
+th,td{border-bottom:1px solid var(--line);padding:7px 4px;text-align:center}
+th{color:var(--soft);font-weight:700;font-size:13px}
+.sym{font-weight:900}
+.s-ok{color:var(--green)}.s-meh{color:var(--amber)}.s-stuck{color:var(--slate)}.s-tip{color:var(--red)}
+.grid td.cell{font-size:13px;line-height:1.25;height:38px}
+.grid th:first-child{width:3.2em}
+.legend{font-size:13px;color:var(--soft);margin:8px 0 0;line-height:1.6}
+.del{border:0;background:none;color:var(--soft);font-size:22px;width:44px;height:40px;border-radius:10px}
+.del:hover{background:var(--chip)}
+tr.pending td{color:var(--soft)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.row-actions{display:flex;gap:8px;margin-top:12px}
+.row-actions button{flex:1;border:1px solid var(--line);background:var(--chip);color:var(--ink);border-radius:12px;min-height:48px;font-size:16px;font-weight:700}
+#copyBox{width:100%;min-height:120px;margin-top:10px;font:13px/1.5 ui-monospace,Menlo,monospace;border:1px solid var(--line);border-radius:10px;background:var(--chip);color:var(--ink);padding:8px}
+.status{font-size:13px;color:var(--soft);margin:8px 0 0;line-height:1.5}
+.status.warn{color:var(--red);font-weight:700}
+.toast{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:center;pointer-events:none;
+  padding:0 max(12px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+.toast-in{pointer-events:auto;max-width:560px;width:100%;display:flex;align-items:center;gap:10px;background:var(--toast);color:var(--on-toast);border-radius:14px;padding:10px 10px 10px 16px;box-shadow:0 6px 20px rgba(0,0,0,.25);font-size:15px;line-height:1.4}
+.toast-in span{flex:1;min-width:0}
+.toast-in button{flex:none;border:0;border-radius:10px;min-height:44px;padding:0 16px;background:var(--gold);color:#1E2A44;font-weight:900;font-size:16px}
+.foot{text-align:center;font-size:13px;color:var(--soft);display:flex;flex-direction:column;align-items:center;gap:6px;padding-top:6px}
+.ver{border:0;background:none;color:var(--soft);font-size:13px;text-decoration:underline dotted;min-height:36px;padding:0 10px}
+#diag{width:100%;text-align:left;white-space:pre-wrap;word-break:break-all;font:12px/1.55 ui-monospace,Menlo,monospace;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;margin:0}
+</style>
+
+<main>
+  <div class="head">
+    <a class="back" href="./#sim">← 回下坡實驗室</a>
+    <h1>坡道紀錄</h1>
+    <p class="sub">在家用書本坡道測你的騎兵：選好條件 → 按開始放手 → 碰到坡底按停止 → 選結果。沒放好就按「重測」，不會記錄。</p>
+  </div>
+
+  <section class="card" aria-label="測試條件">
+    <p class="lab">坡度</p>
+    <div class="seg c3" id="angle"></div>
+    <p class="lab gap">地面</p>
+    <div class="seg c2" id="surface"></div>
+    <p class="lab gap">士兵刻度（1 馬尾 → 7 馬頭）</p>
+    <div class="stepper">
+      <button type="button" id="minus" aria-label="刻度減 0.5">−</button>
+      <output id="scale" aria-live="polite">4</output>
+      <button type="button" id="plus" aria-label="刻度加 0.5">＋</button>
+    </div>
+  </section>
+
+  <section class="card" aria-label="計時">
+    <div class="timer" id="clock" aria-live="off">0.00</div>
+    <button class="go" id="go" type="button">開始</button>
+    <div class="res" id="res" hidden>
+      <button type="button" class="r-ok" data-r="ok">○ 順</button>
+      <button type="button" class="r-meh" data-r="meh">△ 不太順</button>
+      <button type="button" class="r-stuck" data-r="stuck">卡住</button>
+      <button type="button" class="r-tip" data-r="tip">往前倒</button>
+      <button type="button" class="redo" data-r="redo">重測（沒放好，不記）</button>
+    </div>
+    <p class="hint" id="hint">卡住或倒下時也按停止，再選結果。</p>
+  </section>
+
+  <section class="card" aria-labelledby="gridTitle">
+    <p class="lab" id="gridTitle">結果總表・砂紙</p>
+    <div class="tbl"><table class="grid" id="grid"></table></div>
+    <p class="legend">每格上面是最新一次的結果（○ 順、△ 不太順、卡 卡住、倒 往前倒），下面是走到底的平均秒數。換上面的「地面」可以看另一張表。</p>
+  </section>
+
+  <section class="card" aria-labelledby="logTitle">
+    <p class="lab" id="logTitle">全部紀錄</p>
+    <div class="tbl"><table id="log"></table></div>
+    <div class="row-actions">
+      <button type="button" id="copy">複製全部結果</button>
+    </div>
+    <textarea id="copyBox" readonly hidden aria-label="全部結果的文字"></textarea>
+    <p class="status" id="status" role="status">連線中…</p>
+  </section>
+
+  <footer class="foot">
+    <button type="button" class="ver" id="verBtn" aria-expanded="false" aria-controls="diag">版本 2026.11.07-1</button>
+    <pre id="diag" hidden></pre>
+  </footer>
+</main>
+<div class="toast" id="toast" hidden><div class="toast-in"><span id="toastMsg"></span><button type="button" id="toastBtn">復原</button></div></div>
+
+<script>
+(function(){
+  var VERSION='2026.11.07-1';
+  var ANG=[13,17,21], SURF=[['grip','砂紙'],['wood','木板']];
+  var SYM={ok:'○',meh:'△',stuck:'卡',tip:'倒'}, NAME={ok:'順',meh:'不太順',stuck:'卡住',tip:'往前倒'};
+  var SNAME={grip:'砂紙',wood:'木板'};
+  var st={angle:13,surface:'grip',scale:4,t0:0,running:false,elapsed:0,raf:0};
+  // Storage keys and shapes are unchanged: db collection "trials" with {angle,surface,scale,result,sec,at};
+  // localStorage "rampTestLog.v1" keeps the same array of rows (cloud copies + rows still waiting, ids starting with "l").
+  var LS='rampLabRecord.v1';
+  var cloud=[], pend=[], col=null, cloudState='connecting', firstSnap=false, uploading=false, hideIds={}, inflight={};
+  var $=function(id){return document.getElementById(id)};
+  var FIELDS=['angle','surface','scale','result','sec','at'];
+  function pick(r){ var o={}; FIELDS.forEach(function(k){ o[k]=r[k]; }); return o; }
+  function upId(r){ return 'u'+r.at; }
+
+  /* ---------- controls ---------- */
+  function seg(el,items,key){
+    el.innerHTML='';
+    items.forEach(function(it){
+      var v=Array.isArray(it)?it[0]:it, t=Array.isArray(it)?it[1]:it+'°';
+      var b=document.createElement('button'); b.type='button'; b.textContent=t;
+      b.setAttribute('aria-pressed', String(st[key]===v)); b.disabled=st.running;
+      b.onclick=function(){ if(st.running) return; st[key]=v; seg(el,items,key); renderGrid(); };
+      el.appendChild(b);
+    });
+  }
+  function drawControls(){ seg($('angle'),ANG,'angle'); seg($('surface'),SURF,'surface'); $('minus').disabled=$('plus').disabled=st.running; }
+  function setScale(v){ st.scale=Math.min(7,Math.max(1,Math.round(v*2)/2)); $('scale').textContent=st.scale; }
+  $('minus').onclick=function(){ if(!st.running) setScale(st.scale-0.5); };
+  $('plus').onclick=function(){ if(!st.running) setScale(st.scale+0.5); };
+
+  function tick(){ $('clock').textContent=((performance.now()-st.t0)/1000).toFixed(2); st.raf=requestAnimationFrame(tick); }
+  $('go').onclick=function(){
+    var g=$('go');
+    if(!st.running){
+      st.running=true; st.t0=performance.now(); $('res').hidden=true; g.textContent='停止'; g.classList.add('running'); drawControls(); tick();
+    } else {
+      st.running=false; cancelAnimationFrame(st.raf); st.elapsed=(performance.now()-st.t0)/1000;
+      $('clock').textContent=st.elapsed.toFixed(2); g.textContent='開始'; g.classList.remove('running');
+      g.hidden=true; $('res').hidden=false; $('hint').textContent='這次的結果是？'; drawControls();
+    }
+  };
+  $('res').addEventListener('click',function(e){
+    var r=e.target.closest('button'); if(!r) return;
+    var k=r.dataset.r;
+    $('res').hidden=true; $('go').hidden=false; $('hint').textContent='卡住或倒下時也按停止，再選結果。';
+    $('clock').textContent='0.00';
+    if(k==='redo') return;
+    save({angle:st.angle,surface:st.surface,scale:st.scale,result:k,sec:Math.round(st.elapsed*100)/100,at:Date.now()});
+  });
+
+  /* ---------- storage: every record is kept on this phone first, then uploaded ---------- */
+  function persist(){ try{ localStorage.setItem(LS, JSON.stringify(cloud.concat(pend))); }catch(e){} }
+  function describe(r){ return SNAME[r.surface]+' '+r.angle+'° 刻度'+r.scale+' '+NAME[r.result]+' '+Number(r.sec).toFixed(2)+'秒'; }
+  function save(rec){
+    var row=Object.assign({id:'l'+rec.at},rec);
+    pend.push(row); persist(); render();
+    toast('已記錄：'+describe(row), function(){ forget(row); });
+    uploadNext();
+  }
+  function uploadNext(){
+    if(!col || uploading || cloudState!=='live') return;
+    var cloudIds={}; cloud.forEach(function(c){ cloudIds[c.id]=1; });
+    var row=null;
+    for(var i=0;i<pend.length;i++){ if(!cloudIds[upId(pend[i])]){ row=pend[i]; break; } }
+    if(!row){ status(); return; }
+    uploading=true;
+    var uid=upId(row);
+    var pr=inflight[uid]=col.doc(uid).set(pick(row));
+    pr.then(function(){
+      delete inflight[uid]; uploading=false; pend=pend.filter(function(p){ return p.id!==row.id; }); persist(); render(); uploadNext();
+    },function(err){
+      delete inflight[uid]; uploading=false; status('有 '+pend.length+' 筆還沒上傳成功（'+((err&&err.code)||'錯誤')+'），已存在這支手機，下次打開會再試。', true);
+    });
+  }
+  // One write at a time per document: a delete waits for that record's upload to finish.
+  function cloudDelete(uid){
+    hideIds[uid]=1; render();
+    return (inflight[uid]||Promise.resolve()).catch(function(){}).then(function(){ return col.doc(uid).delete(); })
+      .then(function(){ delete hideIds[uid]; render(); },function(e){ delete hideIds[uid]; render(); throw e; });
+  }
+  // Undo of "已記錄": the record may still be waiting on the phone or already be in the cloud.
+  function forget(row){
+    pend=pend.filter(function(p){ return p.id!==row.id; }); persist(); render();
+    if(col) cloudDelete(upId(row)).catch(function(){ toast('復原失敗，這筆還在，可以按 × 刪除。'); });
+  }
+  function removeRow(id, quiet){
+    var r=cloud.concat(pend).filter(function(x){ return x.id===id; })[0]; if(!r) return;
+    if(id.charAt(0)==='l'){
+      forget(r);
+      if(!quiet) toast('已刪除：'+describe(r), function(){ pend.push(r); persist(); render(); uploadNext(); });
+      return;
+    }
+    if(!col || cloudState!=='live'){ toast('要連上雲端才能刪除這筆紀錄。'); return; }
+    var gone=cloudDelete(id);
+    gone.catch(function(){ toast('刪除失敗，這筆還在。'); });
+    if(!quiet) toast('已刪除：'+describe(r), function(){ gone.then(function(){ return col.doc(id).set(pick(r)); }).then(render,function(){ toast('復原失敗，請再記錄一次。'); }); });
+  }
+
+  /* ---------- views ---------- */
+  function allRows(){
+    var ids={}; cloud.forEach(function(c){ ids[c.id]=1; });
+    return cloud.filter(function(c){ return !hideIds[c.id]; })
+      .concat(pend.filter(function(p){ return !ids[upId(p)]; }))
+      .sort(function(a,b){ return a.at-b.at; });
+  }
+  function renderGrid(){
+    $('gridTitle').textContent='結果總表・'+SNAME[st.surface];
+    var rows=allRows();
+    var h='<tr><th>刻度</th>'+ANG.map(function(a){return '<th>'+a+'°</th>'}).join('')+'</tr>';
+    for(var s=1;s<=7;s+=0.5){
+      h+='<tr><th>'+s+'</th>';
+      ANG.forEach(function(a){
+        var rs=rows.filter(function(r){return r.angle===a&&r.scale===s&&r.surface===st.surface});
+        if(!rs.length){h+='<td class="cell"></td>';return;}
+        var last=rs[rs.length-1], ok=rs.filter(function(r){return r.result==='ok'||r.result==='meh'});
+        var avg=ok.length?(ok.reduce(function(t,r){return t+r.sec},0)/ok.length).toFixed(1)+'s':'';
+        h+='<td class="cell"><span class="sym s-'+last.result+'">'+SYM[last.result]+'</span>'+(avg?'<br>'+avg+(ok.length>1?' ×'+ok.length:''):'')+'</td>';
+      });
+      h+='</tr>';
+    }
+    $('grid').innerHTML=h;
+  }
+  function render(){
+    var rows=allRows();
+    var h='<tr><th>#</th><th>地面</th><th>坡度</th><th>刻度</th><th>結果</th><th>秒</th><th><span class="sr">刪除</span></th></tr>';
+    rows.slice().reverse().forEach(function(r,i){
+      var p=r.id.charAt(0)==='l';
+      h+='<tr'+(p?' class="pending" title="還沒上傳到雲端"':'')+'><td>'+(rows.length-i)+(p?'＊':'')+'</td><td>'+SNAME[r.surface]+'</td><td>'+r.angle+'°</td><td>'+r.scale+'</td><td class="sym s-'+r.result+'">'+SYM[r.result]+'</td><td>'+Number(r.sec).toFixed(2)+'</td><td><button type="button" class="del" data-id="'+r.id+'" aria-label="刪除第 '+(rows.length-i)+' 筆">×</button></td></tr>';
+    });
+    if(!rows.length) h+='<tr><td colspan="7" style="color:var(--soft);padding:18px 4px">還沒有紀錄。選好條件後按「開始」，第一筆就會出現在這裡。</td></tr>';
+    $('log').innerHTML=h; renderGrid(); status();
+  }
+  $('log').addEventListener('click',function(e){ var b=e.target.closest('.del'); if(b) removeRow(b.dataset.id); });
+
+  var statusOverride='';
+  function status(msg, warn){
+    if(msg!==undefined){ statusOverride=msg; }
+    var el=$('status'), n=pend.length, t;
+    if(statusOverride){ t=statusOverride; }
+    else if(cloudState==='live') t='已同步雲端，已存好。'+(n?'還有 '+n+' 筆上傳中（＊）。':'');
+    else if(cloudState==='slow') t='雲端還連不上，新紀錄先存在這支手機，連上後會自動上傳。'+(n?'（'+n+' 筆等待中＊）':'');
+    else if(cloudState==='down') t='雲端連線中斷，新紀錄先存在這支手機，下次打開會自動上傳。'+(n?'（'+n+' 筆等待中＊）':'');
+    else if(cloudState==='none') t='紀錄存在這支手機的瀏覽器裡。想給老師看，按「複製全部結果」再貼到 LINE。';
+    else t='連線中…';
+    el.textContent=t; el.classList.toggle('warn', !!warn || ((cloudState==='slow'||cloudState==='down') && n>0));
+  }
+
+  /* ---------- toast with undo ---------- */
+  var toastTimer=0, toastUndo=null;
+  function toast(msg, undo){
+    toastUndo=undo||null; $('toastMsg').textContent=msg; $('toastBtn').hidden=!undo; $('toast').hidden=false;
+    clearTimeout(toastTimer); toastTimer=setTimeout(toastHide, undo?7000:4000);
+  }
+  function toastHide(){ clearTimeout(toastTimer); $('toast').hidden=true; toastUndo=null; }
+  $('toastBtn').onclick=function(){ var f=toastUndo; toastHide(); if(f) f(); };
+
+  /* ---------- copy ---------- */
+  $('copy').onclick=function(){
+    var rows=allRows();
+    var t=rows.map(function(r){ return describe(r); }).join('\n');
+    var box=$('copyBox');
+    function done(){ box.hidden=true; status('已複製 '+rows.length+' 筆，可以直接貼給 Claude。'); setTimeout(function(){ status(''); }, 4000); }
+    function fallback(){
+      box.value=t; box.hidden=false; box.focus(); box.select();
+      var okc=false; try{ okc=document.execCommand('copy'); }catch(e){}
+      if(okc) done(); else status('這裡不能自動複製：文字已全部選好，請長按選取的文字再按「拷貝」。');
+    }
+    try{ navigator.clipboard.writeText(t).then(done, fallback); }catch(e){ fallback(); }
+  };
+
+  /* ---------- version + device info ---------- */
+  function diag(){
+    var p=document.createElement('div');
+    p.style.cssText='position:fixed;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';
+    document.body.appendChild(p); var cs=getComputedStyle(p);
+    var sa=[cs.paddingTop,cs.paddingRight,cs.paddingBottom,cs.paddingLeft].map(function(v){return Math.round(parseFloat(v)||0)}); p.remove();
+    var mm=function(q){ return window.matchMedia && matchMedia(q).matches; };
+    var vv=window.visualViewport;
+    return ['版本 '+VERSION,
+      '畫面 '+innerWidth+'×'+innerHeight+(vv?'（可視 '+Math.round(vv.width)+'×'+Math.round(vv.height)+'）':'')+'　螢幕 '+screen.width+'×'+screen.height+'　像素比 '+(window.devicePixelRatio||1),
+      '方向 '+(innerWidth>innerHeight?'橫向':'直向')+'　開啟方式 '+(mm('(display-mode: standalone)')||navigator.standalone?'主畫面 App':'瀏覽器'),
+      '安全區 上 '+sa[0]+'　右 '+sa[1]+'　下 '+sa[2]+'　左 '+sa[3],
+      '外觀 '+(mm('(prefers-color-scheme: dark)')?'深色':'淺色')+'　雲端 '+cloudState+'　紀錄 '+cloud.length+' 筆＋等待 '+pend.length+' 筆',
+      '網址 '+location.href, '瀏覽器 '+navigator.userAgent].join('\n');
+  }
+  $('verBtn').onclick=function(){ var d=$('diag'), open=d.hidden; d.hidden=!open; this.setAttribute('aria-expanded',String(open)); if(open) d.textContent=diag(); };
+
+  /* ---------- start ---------- */
+  drawControls(); setScale(4);
+  try{
+    var saved=JSON.parse(localStorage.getItem(LS)||'[]');
+    if(Array.isArray(saved)) saved.forEach(function(r){ if(r && r.id && r.at){ (String(r.id).charAt(0)==='l'?pend:cloud).push(r); } });
+  }catch(e){}
+  render();
+
+  cloudState='none'; status();
+})();
+</script>
+
+</html>

@@ -6,7 +6,7 @@
 
    改版時：把 VERSION 改成和 index.html 一樣，舊的網頁快取會自動清掉。
    影片內容換掉時：才把 MEDIA 後面的數字加 1，不然每次改版都要重新下載影片。 */
-var VERSION = '2026.11.05-3';
+var VERSION = '2026.11.07-1';
 var PREFIX = 'ramp-lab-';
 var CACHE = PREFIX + VERSION;
 var MEDIA = PREFIX + 'media-1';
@@ -14,7 +14,7 @@ var BASE = self.registration.scope;
 var INDEX = BASE + 'index.html';
 var NET_WAIT = 3000; /* 導覽請求等網路的最長時間，超過就先開快取 */
 
-var FILES = ['manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png',
+var FILES = ['rec.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png',
   'media/start.jpg', 'media/home-art.png', 'media/secret1.jpg', 'media/secret2.jpg', 'media/secret3.jpg'];
 var VIDEOS = ['media/secret1.mp4', 'media/secret2.mp4', 'media/secret3.mp4'];
 var HELP = ['sim1', 'sim2', 'sim3', 'sim4', 'sim5', 'sec1', 'sec2', 'sec3', 'sec4', 'home1', 'home2', 'home3', 'home4', 'ins1', 'ins2', 'ins3', 'ins4', 'ins5'].map(function(n){ return 'help/' + n + '.jpg'; });
@@ -154,6 +154,7 @@ self.addEventListener('fetch', function(e){
   if (req.method !== 'GET' || key.indexOf(BASE) !== 0) return;
   if (req.mode === 'navigate') {
     if (key === BASE || key === INDEX) e.respondWith(openPage(e));
+    else if (key === BASE + 'rec.html') e.respondWith(fetch(req).catch(function(){ return own(key).then(function(r){ return r || Response.error(); }); }));
     return;
   }
   if (/\.mp4$/.test(u.pathname)) e.respondWith(video(req, key));

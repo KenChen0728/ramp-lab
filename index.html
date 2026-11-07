@@ -108,6 +108,7 @@ button{cursor:pointer}
 h1{font-family:var(--display);font-size:clamp(28px,3.4vw,42px);line-height:1.15;font-weight:700;text-wrap:balance;color:var(--on-band)}
 .lede{font-size:15px;color:var(--on-band-soft);margin-top:4px;text-wrap:balance}
 .tabs{display:flex;gap:4px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:4px;max-width:100%}
+.tablink{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
 .tab{border:0;background:transparent;color:var(--on-band-soft);font-size:17px;font-weight:700;min-height:52px;padding:0 20px;border-radius:999px;white-space:nowrap}
 .tab[aria-selected="true"]{background:var(--on-band);color:var(--band)}
 .tab:hover:not([aria-selected="true"]){color:var(--on-band)}
@@ -300,7 +301,8 @@ body.fs-on,body.fs-on #app{overflow:hidden}
   .brand{flex:1 1 0}
   .band-tools{order:1}
   .tabs{order:2;width:100%}
-  .tab{flex:1;padding:0 8px}
+  .tab{flex:1;padding:0 6px}
+  .tablink{flex:.7}
 }
 @media (min-width:821px) and (min-height:501px){
   .vbox{flex-basis:min(62%,calc((100dvh - 352px)*1.6));width:min(62%,calc((100dvh - 352px)*1.6))}
@@ -383,6 +385,7 @@ body.fs-on,body.fs-on #app{overflow:hidden}
       <button class="tab" role="tab" id="tab-sim" data-target="sim" aria-controls="view-sim" aria-selected="true" type="button">下坡模擬器</button>
       <button class="tab" role="tab" id="tab-secrets" data-target="secrets" aria-controls="view-secrets" aria-selected="false" type="button">三個秘密</button>
       <button class="tab" role="tab" id="tab-home" data-target="home" aria-controls="view-home" aria-selected="false" type="button">在家玩</button>
+      <a class="tab tablink" href="rec.html">紀錄</a>
     </nav>
     <div class="band-tools">
       <button type="button" class="iconbtn" id="homeBtn" aria-label="回到首頁"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11.5 12 4l8.5 7.5"/><path d="M6 9.8V20h12V9.8"/></svg></button>
@@ -544,7 +547,7 @@ body.fs-on,body.fs-on #app{overflow:hidden}
     </section>
     <footer class="foot">
       <p>國立屏東科技大學　陳則翰、許衷源、鄭博元 老師<br>2026 國家圖書館冬季講堂・胡桃鉗大戰老鼠王：逐步下坡玩具科學體驗</p>
-      <button type="button" class="ver" id="verBtn" aria-expanded="false" aria-controls="diag">版本 2026.11.05-3</button>
+      <button type="button" class="ver" id="verBtn" aria-expanded="false" aria-controls="diag">版本 2026.11.07-1</button>
       <pre id="diag" hidden></pre>
     </footer>
 </main>
@@ -572,7 +575,7 @@ body.fs-on,body.fs-on #app{overflow:hidden}
 <script>
 (function(){
   var $ = function(id){ return document.getElementById(id); };
-  var VERSION = '2026.11.05-3';
+  var VERSION = '2026.11.07-1';
   var reduce = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : {matches:false};
 
   var curView = 'start';
@@ -580,7 +583,7 @@ body.fs-on,body.fs-on #app{overflow:hidden}
 
   /* ---------- tabs ---------- */
   var VIEWS = ['start','sim','secrets','home'];
-  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab:not(.tablink)'));
   function show(v, write){
     if (VIEWS.indexOf(v) < 0) v = 'sim';
     if (typeof fsEl !== 'undefined' && fsEl) fsToggle(fsEl);
