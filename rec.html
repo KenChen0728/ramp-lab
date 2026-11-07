@@ -46,6 +46,7 @@ h1{font-size:24px;margin:0;font-weight:900;letter-spacing:.02em}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--card);border-color:var(--ink)}
 .stepper{display:flex;align-items:center;gap:10px}
 .stepper button{width:60px;height:60px;border-radius:14px;border:1px solid var(--line);background:var(--chip);color:var(--ink);font-size:30px;font-weight:800}
+.hint a{color:inherit;font-weight:700}
 .stepper output{flex:1;text-align:center;font-size:42px;font-weight:900;font-variant-numeric:tabular-nums}
 .timer{font-variant-numeric:tabular-nums;font-size:66px;font-weight:900;text-align:center;margin:2px 0 10px;letter-spacing:1px;line-height:1.1}
 .go{width:100%;border:0;border-radius:18px;min-height:76px;font-size:28px;font-weight:900;color:var(--on);background:var(--green)}
@@ -93,7 +94,13 @@ tr.pending td{color:var(--soft)}
 
   <section class="card" aria-label="測試條件">
     <p class="lab">坡度</p>
-    <div class="seg c3" id="angle"></div>
+    <div class="stepper">
+      <button type="button" id="aMinus" aria-label="坡度減 1 度">−</button>
+      <output id="angleOut" aria-live="polite">13°</output>
+      <button type="button" id="aPlus" aria-label="坡度加 1 度">＋</button>
+    </div>
+    <div class="seg c3" id="angle" style="margin-top:8px"></div>
+    <p class="hint" style="text-align:left;margin-top:8px">在家用書本墊的坡道，可以先到 <a href="./#home">在家玩</a> 量出幾度，再用 − ＋ 調成一樣。</p>
     <p class="lab gap">地面</p>
     <div class="seg c2" id="surface"></div>
     <p class="lab gap">士兵刻度（1 馬尾 → 7 馬頭）</p>
@@ -135,7 +142,7 @@ tr.pending td{color:var(--soft)}
   </section>
 
   <footer class="foot">
-    <button type="button" class="ver" id="verBtn" aria-expanded="false" aria-controls="diag">版本 2026.11.07-2</button>
+    <button type="button" class="ver" id="verBtn" aria-expanded="false" aria-controls="diag">版本 2026.11.07-3</button>
     <pre id="diag" hidden></pre>
   </footer>
 </main>
@@ -143,7 +150,7 @@ tr.pending td{color:var(--soft)}
 
 <script>
 (function(){
-  var VERSION='2026.11.07-2';
+  var VERSION='2026.11.07-3';
   var ANG=[13,17,21], SURF=[['grip','砂紙'],['wood','木板']];
   var SYM={ok:'○',meh:'△',stuck:'卡',tip:'倒'}, NAME={ok:'順',meh:'不太順',stuck:'卡住',tip:'往前倒'};
   var SNAME={grip:'砂紙',wood:'木板'};
@@ -164,11 +171,15 @@ tr.pending td{color:var(--soft)}
       var v=Array.isArray(it)?it[0]:it, t=Array.isArray(it)?it[1]:it+'°';
       var b=document.createElement('button'); b.type='button'; b.textContent=t;
       b.setAttribute('aria-pressed', String(st[key]===v)); b.disabled=st.running;
-      b.onclick=function(){ if(st.running) return; st[key]=v; seg(el,items,key); renderGrid(); };
+      b.onclick=function(){ if(st.running) return; st[key]=v; drawControls(); renderGrid(); };
       el.appendChild(b);
     });
   }
-  function drawControls(){ seg($('angle'),ANG,'angle'); seg($('surface'),SURF,'surface'); $('minus').disabled=$('plus').disabled=st.running; }
+  function drawControls(){ seg($('angle'),ANG,'angle'); seg($('surface'),SURF,'surface'); $('angleOut').textContent=st.angle+'°';
+    $('minus').disabled=$('plus').disabled=$('aMinus').disabled=$('aPlus').disabled=st.running; }
+  function setAngle(v){ if(st.running) return; st.angle=Math.min(45,Math.max(1,v)); drawControls(); renderGrid(); }
+  $('aMinus').onclick=function(){ setAngle(st.angle-1); };
+  $('aPlus').onclick=function(){ setAngle(st.angle+1); };
   function setScale(v){ st.scale=Math.min(7,Math.max(1,Math.round(v*2)/2)); $('scale').textContent=st.scale; }
   $('minus').onclick=function(){ if(!st.running) setScale(st.scale-0.5); };
   $('plus').onclick=function(){ if(!st.running) setScale(st.scale+0.5); };
@@ -251,10 +262,12 @@ tr.pending td{color:var(--soft)}
   function renderGrid(){
     $('gridTitle').textContent='結果總表・'+SNAME[st.surface];
     var rows=allRows();
-    var h='<tr><th>刻度</th>'+ANG.map(function(a){return '<th>'+a+'°</th>'}).join('')+'</tr>';
+    var cols={}; rows.forEach(function(r){ if(r.surface===st.surface) cols[r.angle]=1; }); cols[st.angle]=1;
+    var AC=Object.keys(cols).map(Number).sort(function(a,b){return a-b;});
+    var h='<tr><th>刻度</th>'+AC.map(function(a){return '<th>'+a+'°</th>'}).join('')+'</tr>';
     for(var s=1;s<=7;s+=0.5){
       h+='<tr><th>'+s+'</th>';
-      ANG.forEach(function(a){
+      AC.forEach(function(a){
         var rs=rows.filter(function(r){return r.angle===a&&r.scale===s&&r.surface===st.surface});
         if(!rs.length){h+='<td class="cell"></td>';return;}
         var last=rs[rs.length-1], ok=rs.filter(function(r){return r.result==='ok'||r.result==='meh'});
