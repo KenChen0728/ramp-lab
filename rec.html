@@ -46,7 +46,11 @@ h1{font-size:24px;margin:0;font-weight:900;letter-spacing:.02em}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--card);border-color:var(--ink)}
 .stepper{display:flex;align-items:center;gap:10px}
 .stepper button{width:60px;height:60px;border-radius:14px;border:1px solid var(--line);background:var(--chip);color:var(--ink);font-size:30px;font-weight:800}
-.hint a{color:inherit;font-weight:700}
+.warn-box{margin:0;padding:12px 14px;border-radius:12px;background:var(--red);color:#fff;font-size:15px;line-height:1.6;font-weight:700}
+.warn-box a{color:#fff}
+.how summary{font-weight:800;font-size:16px;cursor:pointer;min-height:28px}
+.how ol{margin:10px 0 0;padding-left:1.3em;line-height:1.8;font-size:15px}
+.how a,.hint a{color:inherit;font-weight:700}
 .stepper output{flex:1;text-align:center;font-size:42px;font-weight:900;font-variant-numeric:tabular-nums}
 .timer{font-variant-numeric:tabular-nums;font-size:66px;font-weight:900;text-align:center;margin:2px 0 10px;letter-spacing:1px;line-height:1.1}
 .go{width:100%;border:0;border-radius:18px;min-height:76px;font-size:28px;font-weight:900;color:var(--on);background:var(--green)}
@@ -86,11 +90,23 @@ tr.pending td{color:var(--soft)}
 </style>
 
 <main>
+  <p class="warn-box" id="inapp" hidden>你現在是在 LINE 或 Facebook 裡打開的，紀錄關掉後可能會不見。請按右上角「⋯」或分享鈕，選「用 Safari／Chrome 開啟」再開始記錄。<br><a id="extLink" href="rec.html?openExternalBrowser=1">改用瀏覽器打開</a></p>
   <div class="head">
     <a class="back" href="./#sim">← 回下坡實驗室</a>
     <h1>坡道紀錄</h1>
     <p class="sub">在家用書本坡道測你的騎兵：選好條件 → 按開始放手 → 碰到坡底按停止 → 選結果。沒放好就按「重測」，不會記錄。</p>
   </div>
+
+  <details class="card how">
+    <summary>怎麼用？（點開看）</summary>
+    <ol>
+      <li>用書本把板子一端墊高，板子上鋪毛巾或砂紙。</li>
+      <li>不知道幾度？到<a href="./#home">在家玩</a>輸入板長和書疊高度，就算得出來。</li>
+      <li>在下面選好坡度、地面和士兵刻度。</li>
+      <li>按「開始」同時放手，木馬走到底、卡住或倒下時按「停止」，再選結果。</li>
+      <li>紀錄存在這支手機。想留下來或傳給別人，按最下面「複製全部結果」貼到 LINE 或備忘錄。</li>
+    </ol>
+  </details>
 
   <section class="card" aria-label="測試條件">
     <p class="lab">坡度</p>
@@ -102,7 +118,8 @@ tr.pending td{color:var(--soft)}
     <div class="seg c3" id="angle" style="margin-top:8px"></div>
     <p class="hint" style="text-align:left;margin-top:8px">在家用書本墊的坡道，可以先到 <a href="./#home">在家玩</a> 量出幾度，再用 − ＋ 調成一樣。</p>
     <p class="lab gap">地面</p>
-    <div class="seg c2" id="surface"></div>
+    <div class="seg c3" id="surface"></div>
+    <p class="hint" style="text-align:left;margin-top:8px">用毛巾、桌墊、布或其他材料，就選「其他」。</p>
     <p class="lab gap">士兵刻度（1 馬尾 → 7 馬頭）</p>
     <div class="stepper">
       <button type="button" id="minus" aria-label="刻度減 0.5">−</button>
@@ -142,7 +159,7 @@ tr.pending td{color:var(--soft)}
   </section>
 
   <footer class="foot">
-    <button type="button" class="ver" id="verBtn" aria-expanded="false" aria-controls="diag">版本 2026.11.07-3</button>
+    <button type="button" class="ver" id="verBtn" aria-expanded="false" aria-controls="diag">版本 2026.11.07-4</button>
     <pre id="diag" hidden></pre>
   </footer>
 </main>
@@ -150,10 +167,10 @@ tr.pending td{color:var(--soft)}
 
 <script>
 (function(){
-  var VERSION='2026.11.07-3';
-  var ANG=[13,17,21], SURF=[['grip','砂紙'],['wood','木板']];
+  var VERSION='2026.11.07-4';
+  var ANG=[13,17,21], SURF=[['grip','砂紙'],['wood','木板'],['other','其他']];
   var SYM={ok:'○',meh:'△',stuck:'卡',tip:'倒'}, NAME={ok:'順',meh:'不太順',stuck:'卡住',tip:'往前倒'};
-  var SNAME={grip:'砂紙',wood:'木板'};
+  var SNAME={grip:'砂紙',wood:'木板',other:'其他'};
   var st={angle:13,surface:'grip',scale:4,t0:0,running:false,elapsed:0,raf:0};
   // Storage keys and shapes are unchanged: db collection "trials" with {angle,surface,scale,result,sec,at};
   // localStorage "rampTestLog.v1" keeps the same array of rows (cloud copies + rows still waiting, ids starting with "l").
@@ -326,6 +343,7 @@ tr.pending td{color:var(--soft)}
     try{ navigator.clipboard.writeText(t).then(done, fallback); }catch(e){ fallback(); }
   };
 
+  if(/\bLine\/|FBAN|FBAV|FB_IAB|Instagram/i.test(navigator.userAgent)) $('inapp').hidden=false;
   /* ---------- clear all (tap twice, then 復原 is offered) ---------- */
   var clearArm=0;
   $('clear').onclick=function(){
